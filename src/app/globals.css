@@ -74,7 +74,8 @@ body {
 
 /* Logo glow effect */
 .logo-glow {
-  filter: drop-shadow(0 0 15px rgba(19, 236, 200, 0.4));
+  filter: drop-shadow(0 0 8px rgba(19, 236, 200, 0.6))
+    drop-shadow(0 0 20px rgba(19, 236, 200, 0.3));
 }
 
 /* Gradient mesh background */
