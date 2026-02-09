@@ -7,6 +7,7 @@ interface User {
   name: string;
   phoneNumber: string;
   role: string;
+  groupId?: string | null;
 }
 
 interface UserContextType {

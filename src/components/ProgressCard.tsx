@@ -1,16 +1,25 @@
 import React from "react";
-import { MOCK_DASHBOARD_STATS } from "@/lib/mockData";
 
-export default function ProgressCard() {
-  const percentage = (MOCK_DASHBOARD_STATS.dailyGoalProgress / 20) * 100;
+interface ProgressCardProps {
+  percentage: number;
+  currentJuz: number;
+  dailyGoalProgress: number;
+  remainingPages: number;
+}
 
+export default function ProgressCard({
+  percentage = 0,
+  currentJuz = 1,
+  dailyGoalProgress = 0,
+  remainingPages = 20,
+}: ProgressCardProps) {
   return (
     <div className="bg-surface border border-border rounded-2xl p-8 relative overflow-hidden group">
       {/* Background Decorative Glow */}
       <div className="absolute top-0 right-0 size-32 bg-primary/10 blur-3xl -mr-16 -mt-16 group-hover:bg-primary/20 transition-all"></div>
 
       <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 text-center md:text-left">
-        {/* Circular Progress (Simplified for mock) */}
+        {/* Circular Progress */}
         <div className="relative size-32 flex items-center justify-center">
           <svg className="size-full transform -rotate-90">
             <circle
@@ -30,7 +39,9 @@ export default function ProgressCard() {
               strokeWidth="10"
               fill="transparent"
               strokeDasharray={364.4}
-              strokeDashoffset={364.4 - (364.4 * percentage) / 100}
+              strokeDashoffset={
+                364.4 - (364.4 * Math.min(percentage, 100)) / 100
+              }
               className="text-primary drop-shadow-[0_0_8px_rgba(19,236,200,0.5)]"
               strokeLinecap="round"
             />
@@ -40,7 +51,7 @@ export default function ProgressCard() {
               %{Math.round(percentage)}
             </span>
             <span className="text-[10px] text-foreground-muted uppercase tracking-widest font-bold">
-              Bugün
+              İlerleme
             </span>
           </div>
         </div>
@@ -51,23 +62,23 @@ export default function ProgressCard() {
               Günlük Hedef
             </h4>
             <h3 className="text-3xl font-bold text-white font-display">
-              {MOCK_DASHBOARD_STATS.currentJuz}. Cüz
+              {currentJuz}. Cüz
             </h3>
           </div>
 
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-foreground-muted font-display">
-                Okunan: {MOCK_DASHBOARD_STATS.dailyGoalProgress} Sayfa
+                Tamamlanan: {dailyGoalProgress} Gün
               </span>
               <span className="text-primary font-bold font-display">
-                Kalan: {MOCK_DASHBOARD_STATS.remainingPages}
+                Hedef: 30 Gün
               </span>
             </div>
             <div className="h-2 w-full bg-primary/10 rounded-full overflow-hidden">
               <div
                 className="h-full bg-primary glow-primary rounded-full transition-all duration-1000"
-                style={{ width: `${percentage}%` }}
+                style={{ width: `${Math.min(percentage, 100)}%` }}
               ></div>
             </div>
           </div>

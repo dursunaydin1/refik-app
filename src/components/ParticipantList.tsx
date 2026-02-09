@@ -1,7 +1,19 @@
 import React from "react";
-import { MOCK_GROUP_MEMBERS } from "@/lib/mockData";
 
-export default function ParticipantList() {
+interface Member {
+  id: string;
+  name: string;
+  progress: number;
+  status: string;
+}
+
+interface ParticipantListProps {
+  members: Member[];
+}
+
+export default function ParticipantList({
+  members = [],
+}: ParticipantListProps) {
   return (
     <div className="bg-surface border border-border rounded-2xl overflow-hidden">
       <div className="p-6 border-b border-border flex justify-between items-center">
@@ -9,23 +21,21 @@ export default function ParticipantList() {
           Grup Üyeleri
         </h3>
         <span className="text-sm text-primary font-medium">
-          {MOCK_GROUP_MEMBERS.length} Kişi
+          {members.length} Kişi
         </span>
       </div>
 
       <div className="divide-y divide-border/50">
-        {MOCK_GROUP_MEMBERS.map((member) => (
+        {members.map((member) => (
           <div
             key={member.id}
             className="p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
           >
             <div className="flex items-center gap-4">
               <div className="relative">
-                <img
-                  src={member.avatarUrl}
-                  alt={member.name}
-                  className="size-10 rounded-full border border-border"
-                />
+                <div className="size-10 rounded-full border border-border bg-primary/10 flex items-center justify-center text-primary font-bold">
+                  {member.name.charAt(0)}
+                </div>
                 <div
                   className={`absolute bottom-0 right-0 size-3 rounded-full border-2 border-surface ${
                     member.status === "completed"
@@ -40,8 +50,8 @@ export default function ParticipantList() {
                 <p className="font-bold text-white text-sm font-display">
                   {member.name}
                 </p>
-                <p className="text-xs text-foreground-muted font-display">
-                  {member.lastRead}
+                <p className="text-xs text-foreground-muted font-display uppercase tracking-widest text-[10px]">
+                  {member.status === "completed" ? "Bitirdi" : "Devam Ediyor"}
                 </p>
               </div>
             </div>

@@ -32,20 +32,66 @@ export async function POST(request: Request) {
       throw new Error("Veritabanına bağlanılamadı.");
     }
 
+    const isAdminByPhone = phoneNumber === process.env.ADMIN_PHONE;
+
     if (!user) {
       console.log("Creating new user...");
       try {
+        // First, check if any group exists, if not create the default one
+        let defaultGroup = await prisma.group.findFirst();
+
         user = await prisma.user.create({
           data: {
             name,
             phoneNumber,
-            role: "USER", // Default role
+            role: isAdminByPhone ? "ADMIN" : "USER",
           },
         });
-        console.log("User created:", user);
+
+        if (!defaultGroup && isAdminByPhone) {
+          console.log("Creating default group for admin...");
+          defaultGroup = await prisma.group.create({
+            data: {
+              name: "Refik Grubu",
+              inviteCode: "REFIK2026",
+              adminId: user.id,
+            },
+          });
+        }
+
+        if (defaultGroup) {
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: { groupId: defaultGroup.id },
+          });
+        }
       } catch (createError) {
-        console.error("Prisma Create Error:", createError);
-        throw new Error("Kullanıcı oluşturulamadı.");
+        console.error("Prisma User/Group Creation Error:", createError);
+        throw new Error("Kullanıcı veya grup oluşturulamadı.");
+      }
+    } else {
+      // User exists, check if they need admin upgrade or group joining
+      let needsUpdate = false;
+      const updateData: any = {};
+
+      if (user.role !== "ADMIN" && isAdminByPhone) {
+        updateData.role = "ADMIN";
+        needsUpdate = true;
+      }
+
+      if (!user.groupId) {
+        const defaultGroup = await prisma.group.findFirst();
+        if (defaultGroup) {
+          updateData.groupId = defaultGroup.id;
+          needsUpdate = true;
+        }
+      }
+
+      if (needsUpdate) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: updateData,
+        });
       }
     }
 
@@ -61,8 +107,6 @@ export async function POST(request: Request) {
       }
     }
 
-    // In a real app, we would set a cookie/session here using Auth.js
-    // For now, we return the user data
     return NextResponse.json({
       success: true,
       user: {
@@ -70,6 +114,7 @@ export async function POST(request: Request) {
         name: user.name,
         phoneNumber: user.phoneNumber,
         role: user.role,
+        groupId: user.groupId,
       },
     });
   } catch (error: any) {
