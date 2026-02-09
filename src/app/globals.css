@@ -1,26 +1,101 @@
 @import "tailwindcss";
 
+/* 
+ * Refik Design System
+ * Based on "Organic Symbolism" Logo Variant 3
+ * Dark theme with Soft Mint accent
+ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors */
+  --primary: #13ecc8;
+  --accent: #0d6b5c;
+  --background-dark: #10221f;
+  --background-light: #f6f8f8;
+  --foreground: #f6f8f8;
+  --foreground-muted: rgba(246, 248, 248, 0.7);
+
+  /* Card/Surface colors */
+  --surface: #152a22;
+  --surface-hover: #1a3a2e;
+  --border: rgba(19, 236, 200, 0.2);
+
+  /* Use dark theme by default */
+  --background: var(--background-dark);
 }
 
 @theme inline {
+  /* Colors */
+  --color-primary: var(--primary);
+  --color-accent: var(--accent);
   --color-background: var(--background);
+  --color-background-dark: var(--background-dark);
+  --color-background-light: var(--background-light);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border: var(--border);
+
+  /* Fonts - will be loaded via next/font */
+  --font-display: var(--font-lexend), system-ui, sans-serif;
+  --font-serif: var(--font-lora), Georgia, serif;
+  --font-sans: var(--font-lexend), system-ui, sans-serif;
+
+  /* Border Radius */
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 2rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* Base styles */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-display);
+  min-height: 100vh;
+}
+
+/* Primary button glow effect */
+.glow-primary {
+  box-shadow: 0 0 40px rgba(19, 236, 128, 0.2);
+}
+
+.glow-primary:hover {
+  box-shadow: 0 0 50px rgba(19, 236, 128, 0.35);
+}
+
+/* Reading text style for Quran meal */
+.reading-text {
+  line-height: 2.1;
+  font-size: 1.35rem;
+  font-family: var(--font-serif);
+}
+
+/* Logo glow effect */
+.logo-glow {
+  filter: drop-shadow(0 0 15px rgba(19, 236, 200, 0.4));
+}
+
+/* Gradient mesh background */
+.gradient-mesh {
+  background: radial-gradient(
+    circle at 50% 50%,
+    #1a3a35 0%,
+    var(--background-dark) 100%
+  );
+}
+
+/* Custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(19, 236, 200, 0.2);
+  border-radius: 10px;
 }
