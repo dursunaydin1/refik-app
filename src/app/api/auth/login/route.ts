@@ -32,7 +32,11 @@ export async function POST(request: Request) {
       throw new Error("Veritabanına bağlanılamadı.");
     }
 
-    const isAdminByPhone = phoneNumber === process.env.ADMIN_PHONE;
+    const configuredAdminPhone = process.env.ADMIN_PHONE?.replace(
+      /['"]+/g,
+      "",
+    ).trim();
+    const isAdminByPhone = phoneNumber.trim() === configuredAdminPhone;
 
     if (!user) {
       console.log("Creating new user...");

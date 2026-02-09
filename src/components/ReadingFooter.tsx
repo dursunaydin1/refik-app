@@ -23,9 +23,8 @@ export default function ReadingFooter() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user.id,
-          day: 12, // Mock day
-          lastReadPage: 245, // Mock page
-          isCompleted: true,
+          pageNumber: 245, // In a real app, this would come from the current scroll position or page index
+          dayNumber: 12, // Calculated based on Ramadan start date
         }),
       });
 
