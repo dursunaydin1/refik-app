@@ -59,13 +59,16 @@ export default function LandingPage() {
             </div>
 
             {/* Call to Action */}
-            <div className="flex flex-col items-center gap-6">
-              <button className="group relative flex items-center justify-center w-full max-w-sm h-16 bg-primary text-background-dark rounded-xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all font-display">
+            <div className="flex flex-col items-center gap-6 text-center">
+              <a
+                href="/dashboard"
+                className="group relative flex items-center justify-center w-full max-w-sm h-16 bg-primary text-background-dark rounded-xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all font-display"
+              >
                 <span className="truncate">Katıl ve Başla</span>
                 <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
                   arrow_forward
                 </span>
-              </button>
+              </a>
               <p className="text-sm text-foreground-muted max-w-xs mx-auto italic font-display">
                 "Huzurlu, yargısız ve samimi bir okuma deneyimi için
                 tasarlandı."
