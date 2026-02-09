@@ -1,13 +1,61 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
+import { useUser } from "@/context/UserContext";
 
 /**
  * Login Page
  *
  * Simple authentication using Name and Phone Number.
- * Designed for a warm, community-focused experience.
+ * Communicates with /api/auth/login.
  */
 export default function LoginPage() {
+  const router = useRouter();
+  const { login } = useUser();
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, phoneNumber: phone }),
+      });
+
+      let data;
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("Non-JSON response received:", text);
+        throw new Error("Sunucudan beklenmedik bir yanıt geldi (JSON değil).");
+      }
+
+      if (!response.ok) {
+        throw new Error(data.error || "Giriş başarısız.");
+      }
+
+      // Success! Persist session in context
+      login(data.user);
+      router.push("/dashboard");
+    } catch (err: any) {
+      console.error("Login Error Catch:", err);
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background-dark flex flex-col items-center justify-center p-6 relative overflow-hidden">
       {/* Background Decorative Elements */}
@@ -31,8 +79,20 @@ export default function LoginPage() {
         </div>
 
         {/* Login Form */}
-        <div className="bg-surface border border-border rounded-3xl p-8 space-y-6 shadow-2xl">
+        <form
+          onSubmit={handleLogin}
+          className="bg-surface border border-border rounded-3xl p-8 space-y-6 shadow-2xl"
+        >
           <div className="space-y-4">
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-xl flex items-center gap-2 animate-in fade-in zoom-in-95">
+                <span className="material-symbols-outlined text-base">
+                  error
+                </span>
+                {error}
+              </div>
+            )}
+
             {/* Name Input */}
             <div className="space-y-2">
               <label
@@ -48,7 +108,10 @@ export default function LoginPage() {
                 <input
                   id="name"
                   type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                   placeholder="Örn: Dursun AYDIN"
+                  required
                   className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display placeholder:text-foreground-muted/50"
                 />
               </div>
@@ -69,27 +132,37 @@ export default function LoginPage() {
                 <input
                   id="phone"
                   type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
                   placeholder="05xx xxx xx xx"
+                  required
                   className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display placeholder:text-foreground-muted/50"
                 />
               </div>
             </div>
           </div>
 
-          <a
-            href="/dashboard"
-            className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all font-display"
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all font-display disabled:opacity-50 disabled:hover:scale-100"
           >
-            <span>Giriş Yap</span>
-            <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
-              login
-            </span>
-          </a>
+            {isLoading ? (
+              <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
+            ) : (
+              <>
+                <span>Giriş Yap</span>
+                <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
+                  login
+                </span>
+              </>
+            )}
+          </button>
 
           <p className="text-[10px] text-center text-foreground-muted uppercase tracking-wider font-bold italic leading-relaxed">
             "Sizin en hayırlınız, Kur'an'ı öğrenen ve öğretendir."
           </p>
-        </div>
+        </form>
 
         {/* Helper Link */}
         <p className="text-center text-sm font-display">

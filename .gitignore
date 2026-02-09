@@ -43,3 +43,5 @@ next-env.d.ts
 # project-specific (local development only)
 DEVELOPMENT_LOG.md
 /_reference/
+
+/src/generated/prisma

@@ -1,7 +1,19 @@
+"use client";
+
 import React from "react";
-import { MOCK_INVITER } from "@/lib/mockData";
+import { useUser } from "@/context/UserContext";
 
 export default function Header() {
+  const { user } = useUser();
+
+  const displayName = user?.name || "Misafir";
+  const displayRole = user?.role || "Kullanıcı";
+  const avatarText = displayName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2);
   return (
     <header className="flex items-center justify-between p-6 lg:px-8 border-b border-border bg-background-dark/80 backdrop-blur-md sticky top-0 z-30">
       <div className="grow max-w-xl">
@@ -26,17 +38,15 @@ export default function Header() {
         <div className="flex items-center gap-3 pl-4 border-l border-border">
           <div className="text-right hidden sm:block">
             <p className="text-sm font-bold text-white font-display">
-              {MOCK_INVITER.name}
+              {displayName}
             </p>
             <p className="text-[10px] text-primary uppercase font-bold tracking-widest">
-              Admin
+              {displayRole === "ADMIN" ? "Grup Lideri" : "Üye"}
             </p>
           </div>
-          <img
-            src={MOCK_INVITER.avatarUrl}
-            alt={MOCK_INVITER.name}
-            className="size-10 rounded-xl border border-border"
-          />
+          <div className="size-10 rounded-xl border border-border bg-surface flex items-center justify-center text-primary font-bold font-display">
+            {avatarText}
+          </div>
         </div>
       </div>
     </header>

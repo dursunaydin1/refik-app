@@ -38,6 +38,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { UserProvider } from "@/context/UserContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -54,7 +56,7 @@ export default function RootLayout({
       <body
         className={`${lexend.variable} ${lora.variable} antialiased bg-background-dark text-foreground`}
       >
-        {children}
+        <UserProvider>{children}</UserProvider>
       </body>
     </html>
   );
