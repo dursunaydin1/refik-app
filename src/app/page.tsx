@@ -1,65 +1,83 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <main className="min-h-screen flex flex-col items-center justify-center p-8 gradient-mesh">
+      <div className="max-w-2xl w-full text-center space-y-8">
+        {/* Logo Section */}
+        <div className="flex flex-col items-center gap-4">
+          <div className="size-20 rounded-full bg-primary/10 flex items-center justify-center text-primary logo-glow">
+            <span className="material-symbols-outlined text-5xl">
+              auto_awesome
+            </span>
+          </div>
+          <h1 className="text-5xl font-bold tracking-tight text-white font-display">
+            Refik
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+        </div>
+
+        {/* Brand Narrative */}
+        <div className="space-y-4">
+          <p className="text-xl font-medium text-primary uppercase tracking-[0.2em]">
+            Tasarım Sistemi Testi
+          </p>
+          <p className="text-2xl italic text-foreground-muted font-serif leading-relaxed px-4">
+            "Yoluna eşlik eden bir okuma arkadaşı."
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Component Showcase */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+          {/* Card 1: Colors & Typography */}
+          <div className="p-6 rounded-xl bg-surface border border-border text-left space-y-3">
+            <h3 className="font-bold text-lg text-white">Renkler & Fontlar</h3>
+            <div className="flex gap-2">
+              <div
+                className="size-8 rounded-full bg-primary"
+                title="Primary"
+              ></div>
+              <div
+                className="size-8 rounded-full bg-accent"
+                title="Accent"
+              ></div>
+              <div
+                className="size-8 rounded-full bg-background-dark border border-border"
+                title="BG Dark"
+              ></div>
+            </div>
+            <p className="text-sm text-foreground-muted">
+              Yazı tipi:{" "}
+              <span className="font-display font-bold">Lexend (Display)</span>
+            </p>
+          </div>
+
+          {/* Card 2: Interaction */}
+          <div className="p-6 rounded-xl bg-surface border border-border text-left space-y-4">
+            <h3 className="font-bold text-lg text-white">Etkileşim</h3>
+            <button className="w-full bg-primary text-background-dark font-bold py-3 rounded-full glow-primary transition-all active:scale-95">
+              Katıl ve Başla
+            </button>
+            <p className="text-xs text-center text-foreground-muted italic">
+              Buton: rounded-full + glow + scale
+            </p>
+          </div>
         </div>
-      </main>
-    </div>
+
+        {/* Reading Text Test */}
+        <div className="mt-12 p-8 rounded-2xl bg-surface/50 border border-border/30 text-left">
+          <h4 className="text-xs uppercase tracking-widest text-primary font-bold mb-4">
+            Okuma Metni Testi (Lora)
+          </h4>
+          <article className="reading-text text-foreground-muted">
+            Bu öyle bir kitaptır ki, ayetleri muhkem kılınmış, sonra da her
+            şeyden haberdar olan hikmet sahibi Allah tarafından ayrı ayrı
+            açıklanmıştır.
+          </article>
+        </div>
+
+        {/* Navigation Hint */}
+        <p className="text-sm text-foreground-muted pt-8">
+          Next.js 16 + Tailwind v4 + TypeScript
+        </p>
+      </div>
+    </main>
   );
 }
