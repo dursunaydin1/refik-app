@@ -80,3 +80,31 @@ export const MOCK_DASHBOARD_STATS = {
   remainingPages: 6,
   currentJuz: 12,
 };
+
+export const MOCK_QURAN_PAGE = {
+  juz: 12,
+  pageNumber: 224,
+  suraName: "Hûd Suresi",
+  verses: [
+    {
+      number: 1,
+      text: "Rahman ve Rahim olan Allah'ın adıyla. Elif. Lâm. Râ. Bu öyle bir kitaptır ki, ayetleri muhkem kılınmış, sonra da her şeyden haberdar olan hikmet sahibi Allah tarafından ayrı ayrı açıklanmıştır.",
+    },
+    {
+      number: 2,
+      text: "Ta ki, Allah'tan başkasına kulluk etmeyesiniz. Kuşkusuz ben size O'nun katından gönderilmiş bir uyarıcı ve müjdeleyiciyim.",
+    },
+    {
+      number: 3,
+      text: "Ve Rabbinizden bağışlanma dileyin, sonra O'na tövbe edin ki, sizi belirlenmiş bir süreye kadar güzel bir şekilde yaşatsın ve her fazilet sahibine faziletinin karşılığını versin. Eğer yüz çevirirseniz, ben sizin adınıza büyük bir günün azabından korkarım.",
+    },
+    {
+      number: 4,
+      text: "Dönüşünüz yalnız Allah'adır. O, her şeye kadirdir. Haberiniz olsun ki, onlar O'ndan gizlenmek için göğüslerini dürerler. Bilmiş olun ki, onlar örtülerine büründükleri zaman bile Allah onların neyi gizlediklerini ve neyi açığa vurduklarını bilir. Çünkü O, gönüllerin özünü bilendir.",
+    },
+    {
+      number: 5,
+      text: "Yeryüzünde hiçbir canlı yoktur ki, rızkı Allah'a ait olmasın. O, onun durduğu yeri de, emanet edildiği yeri de bilir. Bunların hepsi apaçık bir kitaptadır.",
+    },
+  ],
+};

@@ -4,7 +4,7 @@ import { MOCK_INVITER } from "@/lib/mockData";
 export default function Header() {
   return (
     <header className="flex items-center justify-between p-6 lg:px-8 border-b border-border bg-background-dark/80 backdrop-blur-md sticky top-0 z-30">
-      <div className="flex-grow max-w-xl">
+      <div className="grow max-w-xl">
         <div className="relative group">
           <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors">
             search

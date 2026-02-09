@@ -45,7 +45,7 @@ export default function ProgressCard() {
           </div>
         </div>
 
-        <div className="flex-grow space-y-4">
+        <div className="grow space-y-4">
           <div className="space-y-1">
             <h4 className="text-primary text-sm font-bold uppercase tracking-widest font-display">
               Günlük Hedef
@@ -72,10 +72,13 @@ export default function ProgressCard() {
             </div>
           </div>
 
-          <button className="w-full md:w-auto bg-primary text-background-dark font-bold px-8 py-3 rounded-xl glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-display">
+          <a
+            href="/reading"
+            className="w-full md:w-auto bg-primary text-background-dark font-bold px-8 py-3 rounded-xl glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-display"
+          >
             <span className="material-symbols-outlined">menu_book</span>
             Okumaya Devam Et
-          </button>
+          </a>
         </div>
       </div>
     </div>
