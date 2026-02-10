@@ -8,6 +8,7 @@ interface User {
   phoneNumber: string;
   role: string;
   groupId?: string | null;
+  hasPassword?: boolean;
 }
 
 interface UserContextType {

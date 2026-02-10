@@ -37,7 +37,17 @@ export async function POST(request: Request) {
       },
     });
 
-    return NextResponse.json({ success: true, progress });
+    // Check for Hatim Completion (30 Days)
+    const completedCount = await prisma.progress.count({
+      where: {
+        userId,
+        isCompleted: true,
+      },
+    });
+
+    const hatimCompleted = completedCount >= 30;
+
+    return NextResponse.json({ success: true, progress, hatimCompleted });
   } catch (error) {
     console.error("Progress API Error:", error);
     return NextResponse.json(

@@ -28,8 +28,14 @@ export default function ReadingFooter() {
         }),
       });
 
+      const data = await response.json();
+
       if (response.ok) {
-        router.push("/dashboard");
+        if (data.hatimCompleted) {
+          router.push("/completion");
+        } else {
+          router.push("/dashboard");
+        }
       }
     } catch (error) {
       console.error("Save failure:", error);
