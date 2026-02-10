@@ -6,16 +6,16 @@ import Logo from "@/components/Logo";
 import { useUser } from "@/context/UserContext";
 
 /**
- * Login Page
+ * Admin Login Page
  *
- * Simple authentication using Name and Phone Number. (Strictly Passwordless)
- * Admin accounts are blocked here and redirected to /admin/login.
+ * Professional restricted entry for administrators.
+ * Only requires Phone Number and Password.
  */
-export default function LoginPage() {
+export default function AdminLoginPage() {
   const router = useRouter();
   const { login } = useUser();
-  const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -28,20 +28,13 @@ export default function LoginPage() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Regular users don't send a password
-        body: JSON.stringify({ name, phoneNumber: phone }),
+        // Name is omitted for professional admin login as they should already exist
+        body: JSON.stringify({ phoneNumber: phone, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // If the error indicates an admin account is trying to sign in,
-        // we can provide a helpful hint to use the admin login.
-        if (response.status === 401 && data.error?.includes("Yönetici")) {
-          throw new Error(
-            "Bu numara yönetici hesabına aittir. Lütfen Yönetici Girişi'ni kullanın.",
-          );
-        }
         throw new Error(data.error || "Giriş başarısız.");
       }
 
@@ -64,17 +57,18 @@ export default function LoginPage() {
       </div>
 
       <div className="w-full max-w-md space-y-8 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-        {/* Logo and Header */}
+        {/* Header */}
         <div className="flex flex-col items-center text-center space-y-4">
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center text-center space-y-1">
             <Logo size={90} showText={false} />
-            <h1 className="text-6xl font-black text-white font-display tracking-tightest">
-              Refik
+            <h1 className="text-5xl font-black text-white font-display tracking-tightest">
+              Refik{" "}
+              <span className="text-primary/70 font-light tracking-widest text-lg ml-1 uppercase">
+                Core
+              </span>
             </h1>
-          </div>
-          <div className="space-y-1">
-            <p className="text-foreground-muted font-display text-base tracking-wide whitespace-nowrap">
-              Yolculuğuna devam etmek için giriş yap.
+            <p className="text-foreground-muted font-display text-xs tracking-[0.4em] opacity-50 uppercase pt-1">
+              Yönetim Terminali
             </p>
           </div>
         </div>
@@ -82,9 +76,14 @@ export default function LoginPage() {
         {/* Login Form */}
         <form
           onSubmit={handleLogin}
-          className="bg-surface border border-border rounded-3xl p-8 space-y-6 shadow-2xl"
+          className="bg-surface border border-border rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden"
         >
-          <div className="space-y-4">
+          {/* Admin Badge */}
+          <div className="absolute top-0 right-0 bg-primary/10 text-primary text-[9px] font-bold px-4 py-1.5 rounded-bl-xl uppercase tracking-[0.2em] border-l border-b border-primary/20">
+            Authorized Access
+          </div>
+
+          <div className="space-y-4 pt-4">
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-xl flex items-center gap-2 animate-in fade-in zoom-in-95">
                 <span className="material-symbols-outlined text-base">
@@ -94,35 +93,11 @@ export default function LoginPage() {
               </div>
             )}
 
-            {/* Name Input */}
-            <div className="space-y-2">
-              <label
-                htmlFor="name"
-                className="text-sm font-bold text-primary uppercase tracking-widest font-display pl-1"
-              >
-                Ad Soyad
-              </label>
-              <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors">
-                  person
-                </span>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Ad Soyad giriniz"
-                  required
-                  className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 hover:border-primary/30 transition-all font-display placeholder:text-foreground-muted/50 cursor-text"
-                />
-              </div>
-            </div>
-
             {/* Phone Input */}
             <div className="space-y-2">
               <label
                 htmlFor="phone"
-                className="text-sm font-bold text-primary uppercase tracking-widest font-display pl-1"
+                className="text-[11px] font-bold text-primary uppercase tracking-[0.2em] font-display pl-1 opactiy-80"
               >
                 Telefon Numarası
               </label>
@@ -141,6 +116,30 @@ export default function LoginPage() {
                 />
               </div>
             </div>
+
+            {/* Password Input */}
+            <div className="space-y-2">
+              <label
+                htmlFor="password"
+                className="text-[11px] font-bold text-primary uppercase tracking-[0.2em] font-display pl-1 opacity-80"
+              >
+                Yönetici Şifresi
+              </label>
+              <div className="relative group">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors">
+                  lock
+                </span>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  required
+                  className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 hover:border-primary/30 transition-all font-display placeholder:text-foreground-muted/50 cursor-text"
+                />
+              </div>
+            </div>
           </div>
 
           <button
@@ -152,33 +151,26 @@ export default function LoginPage() {
               <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
             ) : (
               <>
-                <span>Giriş Yap</span>
+                <span>Oturumu Başlat</span>
                 <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
-                  login
+                  lock_open
                 </span>
               </>
             )}
           </button>
-
-          <p className="text-[10px] text-center text-foreground-muted uppercase tracking-wider font-bold italic leading-relaxed">
-            "Sizin en hayırlınız, Kur'an'ı öğrenen ve öğretendir."
-          </p>
         </form>
 
-        {/* Admin Link at the bottom */}
-        <div className="text-center">
+        <p className="text-center text-sm font-display">
           <button
-            onClick={() => router.push("/admin/login")}
-            className="text-xs text-foreground-muted/50 hover:text-primary transition-colors font-display uppercase tracking-widest border-b border-white/5 pb-1 cursor-pointer"
+            onClick={() => router.push("/login")}
+            className="text-foreground-muted hover:text-white transition-colors flex items-center justify-center gap-1 mx-auto cursor-pointer"
           >
-            Yönetici Paneli Girişi
+            <span className="material-symbols-outlined text-sm">
+              arrow_back
+            </span>
+            Standart Giriş Sayfasına Dön
           </button>
-        </div>
-      </div>
-
-      {/* Footer Branding */}
-      <div className="fixed bottom-8 left-0 right-0 flex justify-center opacity-20 text-[10px] font-bold uppercase tracking-[0.4em] pointer-events-none">
-        Refik Spiritual Companion
+        </p>
       </div>
     </div>
   );

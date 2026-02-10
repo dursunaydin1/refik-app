@@ -1,84 +1,118 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import bcrypt from "bcryptjs";
 
 /**
  * Login API Route
  *
- * Handles authentication via Name & Phone Number. (Passwordless v1)
+ * Handles authentication via Name & Phone Number.
+ * Now requires PASSWORD for ADMIN role.
  */
 export async function POST(request: Request) {
   try {
-    const { name, phoneNumber } = await request.json();
+    const { name, phoneNumber, password } = await request.json();
 
-    if (!name || !phoneNumber) {
+    if (!phoneNumber) {
       return NextResponse.json(
-        { error: "İsim ve telefon numarası gereklidir." },
+        { error: "Telefon numarası gereklidir." },
         { status: 400 },
       );
     }
 
-    // Find or Create User
-    console.log("Login attempt for:", { name, phoneNumber });
-
-    let user;
-    try {
-      user = await prisma.user.findUnique({
-        where: { phoneNumber },
-      });
-      console.log("User find result:", user);
-    } catch (dbError) {
-      console.error("Prisma Find Error:", dbError);
-      throw new Error("Veritabanına bağlanılamadı.");
-    }
-
+    const trimmedPhone = phoneNumber.trim();
     const configuredAdminPhone = process.env.ADMIN_PHONE?.replace(
       /['"]+/g,
       "",
     ).trim();
-    const isAdminByPhone = phoneNumber.trim() === configuredAdminPhone;
+    const isAdminByPhone = trimmedPhone === configuredAdminPhone;
+
+    // Find User
+    let user = await prisma.user.findUnique({
+      where: { phoneNumber: trimmedPhone },
+    });
+
+    if (!user && !name) {
+      return NextResponse.json(
+        { error: "Yeni kullanıcılar için isim gereklidir." },
+        { status: 400 },
+      );
+    }
+
+    // Determine if this attempt is for an Admin role
+    const isTargetingAdmin = user ? user.role === "ADMIN" : isAdminByPhone;
+
+    if (isTargetingAdmin) {
+      if (!password) {
+        return NextResponse.json(
+          { error: "Yönetici girişi için şifre gereklidir." },
+          { status: 401 },
+        );
+      }
+
+      const defaultAdminPassword = process.env.ADMIN_PASSWORD || "admin123";
+
+      if (user && user.password) {
+        // Verify existing password
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) {
+          return NextResponse.json({ error: "Hatalı şifre." }, { status: 401 });
+        }
+      } else {
+        // First time admin or no password set: setup from ENV
+        if (password !== defaultAdminPassword) {
+          return NextResponse.json(
+            { error: "İlk kurulum şifresi hatalı." },
+            { status: 401 },
+          );
+        }
+        // Will be hashed and saved below during create or update
+      }
+    }
 
     if (!user) {
-      console.log("Creating new user...");
-      try {
-        // First, check if any group exists, if not create the default one
-        let defaultGroup = await prisma.group.findFirst();
+      // Create new user
+      let defaultGroup = await prisma.group.findFirst();
+      const hashedPassword = isTargetingAdmin
+        ? await bcrypt.hash(password, 10)
+        : null;
 
-        user = await prisma.user.create({
+      user = await prisma.user.create({
+        data: {
+          name,
+          phoneNumber: trimmedPhone,
+          role: isAdminByPhone ? "ADMIN" : "USER",
+          password: hashedPassword,
+        },
+      });
+
+      if (!defaultGroup && isAdminByPhone) {
+        defaultGroup = await prisma.group.create({
           data: {
-            name,
-            phoneNumber,
-            role: isAdminByPhone ? "ADMIN" : "USER",
+            name: "Refik Grubu",
+            inviteCode: "REFIK2026",
+            adminId: user.id,
           },
         });
+      }
 
-        if (!defaultGroup && isAdminByPhone) {
-          console.log("Creating default group for admin...");
-          defaultGroup = await prisma.group.create({
-            data: {
-              name: "Refik Grubu",
-              inviteCode: "REFIK2026",
-              adminId: user.id,
-            },
-          });
-        }
-
-        if (defaultGroup) {
-          user = await prisma.user.update({
-            where: { id: user.id },
-            data: { groupId: defaultGroup.id },
-          });
-        }
-      } catch (createError) {
-        console.error("Prisma User/Group Creation Error:", createError);
-        throw new Error("Kullanıcı veya grup oluşturulamadı.");
+      if (defaultGroup) {
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: { groupId: defaultGroup.id },
+        });
       }
     } else {
-      // User exists, update logic...
-      let needsUpdate = false;
+      // User exists, update role or password if needed
       const updateData: any = {};
+      let needsUpdate = false;
 
       if (user.role !== "ADMIN" && isAdminByPhone) {
         updateData.role = "ADMIN";
+        needsUpdate = true;
+      }
+
+      if (isTargetingAdmin && !user.password) {
+        updateData.password = await bcrypt.hash(password, 10);
         needsUpdate = true;
       }
 
@@ -90,23 +124,16 @@ export async function POST(request: Request) {
         }
       }
 
+      if (name && user.name !== name) {
+        updateData.name = name;
+        needsUpdate = true;
+      }
+
       if (needsUpdate) {
         user = await prisma.user.update({
           where: { id: user.id },
           data: updateData,
         });
-      }
-    }
-
-    // Update name if different
-    if (user.name !== name) {
-      try {
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: { name },
-        });
-      } catch (updateError) {
-        console.error("Prisma Update Error:", updateError);
       }
     }
 
@@ -123,7 +150,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error("Login Route Error:", error);
     return NextResponse.json(
-      { error: error.message || "Giriş yapılırken bir hata oluştu." },
+      { error: "Giriş yapılırken bir hata oluştu." },
       { status: 500 },
     );
   }
