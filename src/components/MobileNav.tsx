@@ -16,6 +16,7 @@ export default function MobileNav() {
     { icon: "dashboard", label: "Panel", path: "/dashboard" },
     { icon: "menu_book", label: "Okuma", path: "/reading" },
     { icon: "group", label: "Grup", path: "/group" },
+    { icon: "settings", label: "Ayarlar", path: "/settings" },
     { icon: "share", label: "Davet", action: "invite", adminOnly: true },
   ];
 

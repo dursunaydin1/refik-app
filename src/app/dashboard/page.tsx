@@ -117,6 +117,35 @@ export default function DashboardPage() {
                   "Okumak, ruhun her mevsimde yeniden çiçek açmasıdır."
                 </p>
               </div>
+
+              {/* Admin Notification Test Button */}
+              {user?.role === "ADMIN" && (
+                <div className="p-6 rounded-2xl bg-surface border border-border space-y-4">
+                  <h3 className="font-bold text-white font-display">
+                    Yönetici Paneli
+                  </h3>
+                  <button
+                    onClick={async () => {
+                      if (confirm("Herkese bildirim gönderilsin mi?")) {
+                        await fetch("/api/notifications/send", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            userId: "all",
+                            title: "Hatırlatma",
+                            body: "Bugünkü okumanı yapmayı unutma! 📖",
+                          }),
+                        });
+                        alert("Bildirimler gönderildi!");
+                      }
+                    }}
+                    className="w-full bg-surface-lighter hover:bg-surface-hover border border-border text-white font-bold py-3 px-4 rounded-xl transition-all cursor-pointer font-display flex items-center justify-center gap-2 active:scale-95 text-sm"
+                  >
+                    <span className="material-symbols-outlined">send</span>
+                    Hatırlatma Gönder
+                  </button>
+                </div>
+              )}
             </aside>
           </div>
         </main>

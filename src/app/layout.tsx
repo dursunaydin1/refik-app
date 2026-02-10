@@ -25,6 +25,10 @@ const lora = Lora({
   display: "swap",
 });
 
+export const viewport = {
+  themeColor: "#09090b",
+};
+
 export const metadata: Metadata = {
   title: "Refik - Ramazan Okuma Arkadaşı",
   description:
@@ -32,7 +36,6 @@ export const metadata: Metadata = {
   keywords: ["kuran", "meal", "ramazan", "hatim", "okuma", "refik"],
   authors: [{ name: "Refik Team" }],
   manifest: "/manifest.json",
-  themeColor: "#09090b",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -63,7 +66,24 @@ export default function RootLayout({
       <body
         className={`${lexend.variable} ${lora.variable} antialiased bg-background-dark text-foreground`}
       >
-        <UserProvider>{children}</UserProvider>
+        <UserProvider>
+          {children}
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `
+                if ('serviceWorker' in navigator) {
+                  window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                      console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    }, function(err) {
+                      console.log('ServiceWorker registration failed: ', err);
+                    });
+                  });
+                }
+              `,
+            }}
+          />
+        </UserProvider>
       </body>
     </html>
   );
