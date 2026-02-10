@@ -5,7 +5,7 @@ import path from "path";
 
 const dbPath = path.join(process.cwd(), "dev.db");
 const sqlite = new BetterSqlite3(dbPath);
-const adapter = new PrismaBetterSqlite3(sqlite);
+const adapter = new PrismaBetterSqlite3(sqlite as any);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {

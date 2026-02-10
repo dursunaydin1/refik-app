@@ -7,18 +7,29 @@ import ProgressCard from "@/components/ProgressCard";
 import ParticipantList from "@/components/ParticipantList";
 import MobileNav from "@/components/MobileNav";
 import { useUser } from "@/context/UserContext";
+import ProgressChart from "@/components/ProgressChart";
+import StatsCard from "@/components/StatsCard";
+import GroupLeaderboard from "@/components/GroupLeaderboard";
 
 export default function DashboardPage() {
   const { user, isLoading: authLoading } = useUser();
   const [stats, setStats] = useState<any>(null);
+  const [detailedStats, setDetailedStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (user?.id) {
-      fetch(`/api/dashboard?userId=${user.id}`)
-        .then((res) => res.json())
-        .then((data) => {
-          setStats(data);
+      const p1 = fetch(`/api/dashboard?userId=${user.id}`).then((res) =>
+        res.json(),
+      );
+      const p2 = fetch(`/api/stats?userId=${user.id}`).then((res) =>
+        res.json(),
+      );
+
+      Promise.all([p1, p2])
+        .then(([dashboardData, statsData]) => {
+          setStats(dashboardData);
+          setDetailedStats(statsData);
           setIsLoading(false);
         })
         .catch((err) => {
@@ -66,42 +77,73 @@ export default function DashboardPage() {
                 remainingPages={stats?.remainingPages}
               />
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <div className="p-6 rounded-2xl bg-surface border border-border flex items-center gap-4">
-                  <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                    <span className="material-symbols-outlined font-variation-icon">
-                      trending_up
-                    </span>
+              {/* Stats Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <StatsCard
+                  title="Zincir"
+                  value={`${detailedStats?.stats?.streak || 0} Gün`}
+                  icon="local_fire_department"
+                  trend="İstikrarlı"
+                  trendUp={true}
+                />
+                <StatsCard
+                  title="Toplam"
+                  value={detailedStats?.stats?.totalRead || 0}
+                  icon="auto_stories"
+                />
+                <div className="p-4 rounded-2xl bg-surface border border-border flex flex-col justify-between">
+                  <span className="text-foreground-muted text-xs font-medium">
+                    Grup
+                  </span>
+                  <div className="text-primary font-bold text-lg font-display">
+                    %{stats?.totalGroupProgress || 0}
                   </div>
-                  <div>
-                    <p className="text-xs text-foreground-muted uppercase font-bold tracking-widest text-[10px]">
-                      Grup İlerlemesi
-                    </p>
-                    <p className="text-xl font-bold text-white font-display">
-                      %{stats?.totalGroupProgress || 0}
-                    </p>
-                  </div>
+                  <span className="material-symbols-outlined text-primary/20 text-4xl absolute bottom-2 right-2">
+                    trending_up
+                  </span>
                 </div>
+                <div className="p-4 rounded-2xl bg-surface border border-border flex flex-col justify-between">
+                  <span className="text-foreground-muted text-xs font-medium">
+                    Kalan
+                  </span>
+                  <div className="text-white font-bold text-lg font-display">
+                    {30 - (stats?.dailyGoalProgress || 0)} Gün
+                  </div>
+                  <span className="material-symbols-outlined text-white/10 text-4xl absolute bottom-2 right-2">
+                    event
+                  </span>
+                </div>
+              </div>
 
-                <div className="p-6 rounded-2xl bg-surface border border-border flex items-center gap-4">
-                  <div className="size-12 rounded-xl bg-accent/20 flex items-center justify-center text-accent">
-                    <span className="material-symbols-outlined font-variation-icon text-accent">
-                      event
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-xs text-foreground-muted uppercase font-bold tracking-widest text-[10px]">
-                      Kalan Gün
-                    </p>
-                    <p className="text-xl font-bold text-white font-display">
-                      {30 - (stats?.dailyGoalProgress || 0)} Gün
-                    </p>
-                  </div>
+              {/* Activity Chart */}
+              <div className="p-6 rounded-2xl bg-surface border border-border space-y-4">
+                <h3 className="font-bold text-white font-display">
+                  Okuma Aktivitesi
+                </h3>
+                <div className="h-[200px] w-full">
+                  {detailedStats?.chartData && (
+                    <ProgressChart data={detailedStats.chartData} />
+                  )}
                 </div>
               </div>
             </div>
 
             <aside className="space-y-8">
+              {/* Leaderboard */}
+              <div className="p-6 rounded-2xl bg-surface border border-border space-y-4">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-white font-display">
+                    Liderlik Tablosu
+                  </h3>
+                  <span className="material-symbols-outlined text-yellow-400">
+                    emoji_events
+                  </span>
+                </div>
+                {detailedStats?.leaderboard && (
+                  <GroupLeaderboard users={detailedStats.leaderboard} />
+                )}
+              </div>
+
               <ParticipantList members={stats?.members} />
 
               <div className="p-6 rounded-2xl bg-accent/10 border border-accent/20 space-y-3">

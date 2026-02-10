@@ -35,6 +35,10 @@ export const metadata: Metadata = {
     "Ramazan boyunca Kur'an mealini arkadaşlarınla birlikte, kaldığın yerden ve sakin bir şekilde takip et.",
   keywords: ["kuran", "meal", "ramazan", "hatim", "okuma", "refik"],
   authors: [{ name: "Refik Team" }],
+  icons: {
+    icon: "/logo.svg",
+    apple: "/logo.svg",
+  },
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
