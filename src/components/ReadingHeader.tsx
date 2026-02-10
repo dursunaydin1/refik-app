@@ -1,8 +1,19 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
-import { MOCK_QURAN_PAGE } from "@/lib/mockData";
 
-export default function ReadingHeader() {
+interface ReadingHeaderProps {
+  juz: number;
+  suraName: string;
+  day: number;
+}
+
+export default function ReadingHeader({
+  juz,
+  suraName,
+  day,
+}: ReadingHeaderProps) {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-background-dark/80 backdrop-blur-md border-b border-white/5">
       <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -17,10 +28,10 @@ export default function ReadingHeader() {
           </Link>
           <div className="flex flex-col">
             <h2 className="text-sm font-bold text-white font-display">
-              {MOCK_QURAN_PAGE.juz}. Cüz — Sayfa {MOCK_QURAN_PAGE.pageNumber}
+              {juz}. Cüz — {day}. Gün
             </h2>
             <div className="flex items-center gap-2 text-[10px] text-foreground-muted uppercase tracking-widest font-bold">
-              <span>{MOCK_QURAN_PAGE.suraName}</span>
+              <span>{suraName} Suresi</span>
             </div>
           </div>
         </div>
@@ -43,7 +54,7 @@ export default function ReadingHeader() {
       <div className="w-full h-[2px] bg-white/5">
         <div
           className="h-full bg-primary glow-primary transition-all duration-500"
-          style={{ width: "65%" }}
+          style={{ width: `${Math.round((day / 29) * 100)}%` }}
         ></div>
       </div>
     </header>

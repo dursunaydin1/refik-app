@@ -84,7 +84,7 @@ export default function ProgressCard({
           </div>
 
           <a
-            href="/reading"
+            href={`/reading`}
             className="w-full md:w-auto bg-primary text-background-dark font-bold px-8 py-3 rounded-xl glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 font-display"
           >
             <span className="material-symbols-outlined">menu_book</span>

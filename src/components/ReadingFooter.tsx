@@ -4,12 +4,15 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 
-export default function ReadingFooter() {
+interface ReadingFooterProps {
+  day: number;
+}
+
+export default function ReadingFooter({ day }: ReadingFooterProps) {
   const router = useRouter();
   const { user } = useUser();
   const [isSaving, setIsSaving] = useState(false);
 
-  // For MVP, we use mock values for day and page
   const handleFinish = async () => {
     if (!user) {
       router.push("/login");
@@ -23,8 +26,8 @@ export default function ReadingFooter() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user.id,
-          pageNumber: 245, // In a real app, this would come from the current scroll position or page index
-          dayNumber: 12, // Calculated based on Ramadan start date
+          pageNumber: day * 20, // Approximate page number based on day
+          dayNumber: day,
         }),
       });
 
@@ -43,6 +46,7 @@ export default function ReadingFooter() {
       setIsSaving(false);
     }
   };
+
   return (
     <footer className="fixed bottom-0 left-0 right-0 p-8 flex flex-col items-center pointer-events-none z-40">
       {/* Finish for Today Button */}
@@ -57,25 +61,9 @@ export default function ReadingFooter() {
           ) : (
             <>
               <span className="material-symbols-outlined">task_alt</span>
-              Bugünlük Bitti
+              {day}. Gün Tamamlandı
             </>
           )}
-        </button>
-      </div>
-
-      {/* Navigation Hint (Mobile) */}
-      <div className="pointer-events-auto flex justify-between w-full max-w-md mt-6 lg:hidden">
-        <button className="flex items-center gap-1 text-foreground-muted font-bold text-[10px] uppercase tracking-widest hover:text-primary transition-colors font-display cursor-pointer active:scale-95 p-2">
-          <span className="material-symbols-outlined text-sm">
-            chevron_left
-          </span>
-          Önceki
-        </button>
-        <button className="flex items-center gap-1 text-foreground-muted font-bold text-[10px] uppercase tracking-widest hover:text-primary transition-colors font-display cursor-pointer active:scale-95 p-2">
-          Sonraki
-          <span className="material-symbols-outlined text-sm">
-            chevron_right
-          </span>
         </button>
       </div>
     </footer>

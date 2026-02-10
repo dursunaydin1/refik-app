@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import bcrypt from "bcryptjs";
 
 /**
  * Login API Route
  *
- * Handles authentication via Name & Phone Number.
- * Supports optional Password verification.
+ * Handles authentication via Name & Phone Number. (Passwordless v1)
  */
 export async function POST(request: Request) {
   try {
-    const { name, phoneNumber, password } = await request.json();
+    const { name, phoneNumber } = await request.json();
 
     if (!name || !phoneNumber) {
       return NextResponse.json(
@@ -33,21 +31,6 @@ export async function POST(request: Request) {
       throw new Error("Veritabanına bağlanılamadı.");
     }
 
-    // Password Verification Logic
-    if (user && user.password) {
-      if (!password) {
-        return NextResponse.json(
-          { error: "Lütfen şifrenizi giriniz.", requirePassword: true },
-          { status: 401 },
-        );
-      }
-
-      const isPasswordValid = await bcrypt.compare(password, user.password);
-      if (!isPasswordValid) {
-        return NextResponse.json({ error: "Hatalı şifre." }, { status: 401 });
-      }
-    }
-
     const configuredAdminPhone = process.env.ADMIN_PHONE?.replace(
       /['"]+/g,
       "",
@@ -60,16 +43,10 @@ export async function POST(request: Request) {
         // First, check if any group exists, if not create the default one
         let defaultGroup = await prisma.group.findFirst();
 
-        // Hash password if provided during registration (optional)
-        const hashedPassword = password
-          ? await bcrypt.hash(password, 10)
-          : null;
-
         user = await prisma.user.create({
           data: {
             name,
             phoneNumber,
-            password: hashedPassword,
             role: isAdminByPhone ? "ADMIN" : "USER",
           },
         });
@@ -121,11 +98,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // Update name if different and NO password exists (prevent account takeover by name change if not secured)
-    // If password exists, we don't auto-update name from login form to be safe?
-    // Actually, for consistency let's allow it for now, or maybe restrict it.
-    // Let's restrict name update if password is set, to encourage using Settings.
-    if (user.name !== name && !user.password) {
+    // Update name if different
+    if (user.name !== name) {
       try {
         user = await prisma.user.update({
           where: { id: user.id },
@@ -144,7 +118,6 @@ export async function POST(request: Request) {
         phoneNumber: user.phoneNumber,
         role: user.role,
         groupId: user.groupId,
-        hasPassword: !!user.password, // Tell frontend if user has password
       },
     });
   } catch (error: any) {

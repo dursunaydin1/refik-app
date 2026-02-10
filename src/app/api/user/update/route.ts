@@ -25,30 +25,6 @@ export async function POST(request: Request) {
       updateData.name = name;
     }
 
-    // Update Password
-    if (password) {
-      // If user already has a password, verify current password
-      if (user.password && !currentPassword) {
-        return NextResponse.json(
-          { error: "Mevcut şifrenizi girmelisiniz." },
-          { status: 400 },
-        );
-      }
-
-      if (user.password && currentPassword) {
-        const isMatch = await bcrypt.compare(currentPassword, user.password);
-        if (!isMatch) {
-          return NextResponse.json(
-            { error: "Mevcut şifre hatalı." },
-            { status: 400 },
-          );
-        }
-      }
-
-      const hashedPassword = await bcrypt.hash(password, 10);
-      updateData.password = hashedPassword;
-    }
-
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: updateData,
@@ -59,7 +35,6 @@ export async function POST(request: Request) {
       user: {
         id: updatedUser.id,
         name: updatedUser.name,
-        hasPassword: !!updatedUser.password,
       },
     });
   } catch (error: any) {
