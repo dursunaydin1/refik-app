@@ -66,7 +66,7 @@ export default function ReadingPage() {
 
       {/* Side Navigation Floating Buttons (Desktop) */}
       <div className="fixed top-1/2 -translate-y-1/2 left-8 hidden xl:flex flex-col items-center gap-3 group cursor-pointer animate-in fade-in slide-in-from-left-4 duration-1000">
-        <button className="size-16 rounded-full flex items-center justify-center bg-surface border border-border shadow-lg hover:border-primary/50 hover:bg-surface-hover transition-all">
+        <button className="size-16 rounded-full flex items-center justify-center bg-surface border border-border shadow-lg hover:border-primary hover:bg-surface-hover hover:scale-110 active:scale-95 transition-all cursor-pointer">
           <span className="material-symbols-outlined text-foreground-muted group-hover:text-primary transition-colors">
             chevron_left
           </span>
@@ -77,7 +77,7 @@ export default function ReadingPage() {
       </div>
 
       <div className="fixed top-1/2 -translate-y-1/2 right-8 hidden xl:flex flex-col items-center gap-3 group cursor-pointer animate-in fade-in slide-in-from-right-4 duration-1000">
-        <button className="size-16 rounded-full flex items-center justify-center bg-surface border border-border shadow-lg hover:border-primary/50 hover:bg-surface-hover transition-all">
+        <button className="size-16 rounded-full flex items-center justify-center bg-surface border border-border shadow-lg hover:border-primary hover:bg-surface-hover hover:scale-110 active:scale-95 transition-all cursor-pointer">
           <span className="material-symbols-outlined text-foreground-muted group-hover:text-primary transition-colors">
             chevron_right
           </span>

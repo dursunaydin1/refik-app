@@ -44,7 +44,7 @@ export default function ReadingFooter() {
         <button
           onClick={handleFinish}
           disabled={isSaving}
-          className="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-5 rounded-2xl shadow-xl shadow-primary/20 flex items-center justify-center gap-3 transition-all active:scale-95 font-display text-lg disabled:opacity-50"
+          className="w-full bg-primary hover:bg-primary/90 text-background-dark font-bold py-5 rounded-2xl shadow-xl shadow-primary/20 flex items-center justify-center gap-3 transition-all active:scale-95 font-display text-lg disabled:opacity-50 cursor-pointer hover:shadow-primary/40"
         >
           {isSaving ? (
             <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
@@ -59,13 +59,13 @@ export default function ReadingFooter() {
 
       {/* Navigation Hint (Mobile) */}
       <div className="pointer-events-auto flex justify-between w-full max-w-md mt-6 lg:hidden">
-        <button className="flex items-center gap-1 text-foreground-muted font-bold text-[10px] uppercase tracking-widest hover:text-primary transition-colors font-display">
+        <button className="flex items-center gap-1 text-foreground-muted font-bold text-[10px] uppercase tracking-widest hover:text-primary transition-colors font-display cursor-pointer active:scale-95 p-2">
           <span className="material-symbols-outlined text-sm">
             chevron_left
           </span>
           Önceki
         </button>
-        <button className="flex items-center gap-1 text-foreground-muted font-bold text-[10px] uppercase tracking-widest hover:text-primary transition-colors font-display">
+        <button className="flex items-center gap-1 text-foreground-muted font-bold text-[10px] uppercase tracking-widest hover:text-primary transition-colors font-display cursor-pointer active:scale-95 p-2">
           Sonraki
           <span className="material-symbols-outlined text-sm">
             chevron_right

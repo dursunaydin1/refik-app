@@ -31,6 +31,13 @@ export const metadata: Metadata = {
     "Ramazan boyunca Kur'an mealini arkadaşlarınla birlikte, kaldığın yerden ve sakin bir şekilde takip et.",
   keywords: ["kuran", "meal", "ramazan", "hatim", "okuma", "refik"],
   authors: [{ name: "Refik Team" }],
+  manifest: "/manifest.json",
+  themeColor: "#09090b",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Refik",
+  },
   openGraph: {
     title: "Refik - Ramazan Okuma Arkadaşı",
     description: "Yoluna eşlik eden bir okuma arkadaşı.",

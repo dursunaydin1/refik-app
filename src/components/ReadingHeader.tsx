@@ -26,13 +26,13 @@ export default function ReadingHeader() {
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-            <span className="material-symbols-outlined text-xl text-foreground-muted">
+          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors cursor-pointer hover:text-white group">
+            <span className="material-symbols-outlined text-xl text-foreground-muted group-hover:text-white transition-colors">
               settings
             </span>
           </button>
-          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors">
-            <span className="material-symbols-outlined text-xl text-foreground-muted">
+          <button className="p-2 hover:bg-white/5 rounded-lg transition-colors cursor-pointer hover:text-white group">
+            <span className="material-symbols-outlined text-xl text-foreground-muted group-hover:text-white transition-colors">
               ios_share
             </span>
           </button>
