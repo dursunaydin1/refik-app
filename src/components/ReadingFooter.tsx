@@ -19,6 +19,12 @@ export default function ReadingFooter({ day }: ReadingFooterProps) {
       return;
     }
 
+    // Yanlışlıkla tıklamayı önle
+    const confirmed = window.confirm(
+      `${day}. günün okumasını tamamladın mı?\n\nBu işlem geri alınamaz.`,
+    );
+    if (!confirmed) return;
+
     setIsSaving(true);
     try {
       const response = await fetch("/api/progress", {
@@ -26,22 +32,26 @@ export default function ReadingFooter({ day }: ReadingFooterProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           userId: user.id,
-          pageNumber: day * 20, // Approximate page number based on day
+          pageNumber: day * 20,
           dayNumber: day,
         }),
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        if (data.hatimCompleted) {
-          router.push("/completion");
-        } else {
-          router.push("/dashboard");
-        }
+      if (!response.ok) {
+        alert(data.error || "Bir hata oluştu.");
+        return;
+      }
+
+      if (data.hatimCompleted) {
+        router.push("/completion");
+      } else {
+        router.push("/dashboard");
       }
     } catch (error) {
       console.error("Save failure:", error);
+      alert("Bağlantı hatası. Lütfen tekrar deneyin.");
     } finally {
       setIsSaving(false);
     }

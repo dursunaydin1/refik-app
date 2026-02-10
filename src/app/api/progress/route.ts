@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { getRamadanStatus, getRamadanDay } from "@/lib/ramadanDates";
 
 /**
  * Progress API Route
  *
  * Saves a user's reading progress for a specific day/page.
+ * Only allows saves during Ramadan period.
  */
 export async function POST(request: Request) {
   try {
@@ -17,12 +19,33 @@ export async function POST(request: Request) {
       );
     }
 
+    // Block progress saves outside Ramadan
+    const status = getRamadanStatus();
+    if (status === "before") {
+      return NextResponse.json(
+        { error: "Ramazan henüz başlamadı. İlerleme kaydedilemez." },
+        { status: 403 },
+      );
+    }
+
+    // Validate day number matches current Ramadan day
+    const currentDay = getRamadanDay();
+    const targetDay = dayNumber || currentDay;
+
+    // Don't allow saving for future days
+    if (targetDay > currentDay && status === "during") {
+      return NextResponse.json(
+        { error: "Gelecek günler için ilerleme kaydedilemez." },
+        { status: 403 },
+      );
+    }
+
     // Use upsert to create or update progress for the specific day
     const progress = await prisma.progress.upsert({
       where: {
         userId_day: {
           userId,
-          day: dayNumber || 1, // Defaulting to day 1 if not provided
+          day: targetDay,
         },
       },
       update: {
@@ -31,7 +54,7 @@ export async function POST(request: Request) {
       },
       create: {
         userId,
-        day: dayNumber || 1,
+        day: targetDay,
         lastReadPage: pageNumber,
         isCompleted: true,
       },

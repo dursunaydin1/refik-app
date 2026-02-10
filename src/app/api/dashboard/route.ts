@@ -1,10 +1,17 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import {
+  getRamadanDay,
+  getRamadanStatus,
+  RAMADAN_START,
+  RAMADAN_END,
+} from "@/lib/ramadanDates";
 
 /**
  * Dashboard API Route
  *
  * Fetches group progress, user specific progress, and participant list.
+ * Only counts progress entries within the Ramadan 2026 date range.
  */
 export async function GET(request: Request) {
   try {
@@ -26,12 +33,20 @@ export async function GET(request: Request) {
           include: {
             members: {
               include: {
-                progress: true,
+                progress: {
+                  where: {
+                    updatedAt: { gte: RAMADAN_START, lte: RAMADAN_END },
+                  },
+                },
               },
             },
           },
         },
-        progress: true,
+        progress: {
+          where: {
+            updatedAt: { gte: RAMADAN_START, lte: RAMADAN_END },
+          },
+        },
       },
     });
 
@@ -42,31 +57,31 @@ export async function GET(request: Request) {
       );
     }
 
-    // Calculate User Progress
-    const userProgress = user.progress.length; // Number of days completed
-    const dailyGoalProgress =
-      userProgress > 0
-        ? (user.progress[user.progress.length - 1].lastReadPage / 603) * 100
-        : 0;
+    // Only count progress within Ramadan dates
+    const userProgress = user.progress.length;
 
     // Calculate Group Stats
     const membersCount = user.group?.members.length || 0;
     const groupProgress =
       user.group?.members.reduce((acc, member) => {
-        // Average progress across members
         const memberDays = member.progress.length;
         return acc + (memberDays / 30) * 100;
       }, 0) || 0;
 
+    const ramadanStatus = getRamadanStatus();
+
     const stats = {
       userProgressPercentage: Math.round((userProgress / 30) * 100),
       totalGroupProgress: Math.round(groupProgress / (membersCount || 1)),
-      dailyGoalProgress: userProgress, // Current day
-      remainingPages: 20, // Simplified for MVP
+      dailyGoalProgress: userProgress,
+      remainingPages: 20,
       currentJuz:
-        Math.floor(
-          (user.progress[user.progress.length - 1]?.lastReadPage || 0) / 20,
-        ) + 1,
+        ramadanStatus === "before"
+          ? 1
+          : ramadanStatus === "after"
+            ? 30
+            : getRamadanDay(),
+      ramadanStatus,
       members:
         user.group?.members.map((m) => ({
           id: m.id,
