@@ -68,13 +68,13 @@ export default function LoginPage() {
         <div className="flex flex-col items-center text-center space-y-4">
           <div className="flex flex-col items-center gap-1">
             <Logo size={90} showText={false} />
-            <h1 className="text-6xl font-black text-white font-display tracking-tightest">
+            <h1 className="text-6xl font-black text-white font-display tracking-[-0.05em]">
               Refik
             </h1>
           </div>
           <div className="space-y-1">
-            <p className="text-foreground-muted font-display text-base tracking-wide whitespace-nowrap">
-              Yolculuğuna devam etmek için giriş yap.
+            <p className="text-foreground-muted font-display text-base tracking-wide">
+              Huzur dolu bir hasbihal için seni bekliyoruz.
             </p>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Ad Soyad giriniz"
+                  placeholder="Adınız Soyadınız"
                   required
                   className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 hover:border-primary/30 transition-all font-display placeholder:text-foreground-muted/50 cursor-text"
                 />
