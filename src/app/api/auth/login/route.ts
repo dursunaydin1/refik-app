@@ -69,9 +69,31 @@ export async function POST(request: Request) {
       }
     }
 
+    // -------------------------------------------------------------------------
+    // GROUP CREATION & ASSIGNMENT LOGIC
+    // -------------------------------------------------------------------------
+    let defaultGroup = await prisma.group.findFirst();
+
+    // If no group exists and this is an Admin, create the default "Refik Grubu"
+    if (!defaultGroup && isTargetingAdmin) {
+      // We need a user ID to create a group (as adminId)
+      // If user doesn't exist yet, we'll create the user first, then the group.
+      // If user exists, we use their ID.
+      const adminUserId = user ? user.id : null;
+
+      if (adminUserId) {
+        defaultGroup = await prisma.group.create({
+          data: {
+            name: "Refik Grubu",
+            inviteCode: "REFIK2026",
+            adminId: adminUserId,
+          },
+        });
+      }
+    }
+
     if (!user) {
       // Create new user
-      let defaultGroup = await prisma.group.findFirst();
       const hashedPassword = isTargetingAdmin
         ? await bcrypt.hash(password, 10)
         : null;
@@ -82,9 +104,13 @@ export async function POST(request: Request) {
           phoneNumber: trimmedPhone,
           role: isAdminByPhone ? "ADMIN" : "USER",
           password: hashedPassword,
+          // Assign to group if one exists
+          groupId: defaultGroup ? defaultGroup.id : null,
         },
       });
 
+      // Special case: if this was the FIRST admin and we just created them,
+      // create the group now that we have their ID.
       if (!defaultGroup && isAdminByPhone) {
         defaultGroup = await prisma.group.create({
           data: {
@@ -93,16 +119,15 @@ export async function POST(request: Request) {
             adminId: user.id,
           },
         });
-      }
 
-      if (defaultGroup) {
+        // Update user with the newly created group ID
         user = await prisma.user.update({
           where: { id: user.id },
           data: { groupId: defaultGroup.id },
         });
       }
     } else {
-      // User exists, update role or password if needed
+      // User exists, update role, password, or group if needed
       const updateData: any = {};
       let needsUpdate = false;
 
@@ -116,12 +141,10 @@ export async function POST(request: Request) {
         needsUpdate = true;
       }
 
-      if (!user.groupId) {
-        const defaultGroup = await prisma.group.findFirst();
-        if (defaultGroup) {
-          updateData.groupId = defaultGroup.id;
-          needsUpdate = true;
-        }
+      // Important: Assign to group if they don't have one
+      if (!user.groupId && defaultGroup) {
+        updateData.groupId = defaultGroup.id;
+        needsUpdate = true;
       }
 
       if (name && user.name !== name) {
