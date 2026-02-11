@@ -10,18 +10,21 @@ datasource db {
 }
 
 model User {
-  id          String     @id @default(uuid())
-  phoneNumber String     @unique
-  password    String?    // Optional for now, allows progressive security
-  name        String
-  role        String     @default("USER") // "USER" | "ADMIN"
-  groupId     String?
-  group       Group?     @relation("GroupMembers", fields: [groupId], references: [id])
-  administeredGroup Group? @relation("GroupAdmin")
-  progress    Progress[]
-  subscriptions PushSubscription[]
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  id               String     @id @default(uuid())
+  phoneNumber      String     @unique
+  password         String?    // Required after activation
+  name             String
+  role             String     @default("USER") // "USER" | "ADMIN"
+  status           String     @default("PENDING") // "PENDING" | "ACTIVE"
+  activationToken  String?    @unique // One-time token for new users
+  tokenExpires     DateTime?
+  groupId          String?
+  group            Group?     @relation("GroupMembers", fields: [groupId], references: [id])
+  administeredGroup Group?     @relation("GroupAdmin")
+  progress         Progress[]
+  subscriptions    PushSubscription[]
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
 }
 
 model Group {

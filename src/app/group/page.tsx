@@ -12,7 +12,6 @@ export default function GroupPage() {
   const [members, setMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [inviteCode, setInviteCode] = useState("...");
 
   useEffect(() => {
     if (user?.groupId) {
@@ -63,19 +62,8 @@ export default function GroupPage() {
     }
   };
 
-  const handleOpenInvite = async () => {
+  const handleOpenInvite = () => {
     setIsInviteOpen(true);
-    if (user?.id) {
-      try {
-        const res = await fetch(`/api/group/invite-code?userId=${user.id}`);
-        const data = await res.json();
-        if (data.inviteCode) {
-          setInviteCode(data.inviteCode);
-        }
-      } catch (err) {
-        console.error("Davet kodu alınamadı:", err);
-      }
-    }
   };
 
   if (!user) return null;
@@ -190,7 +178,6 @@ export default function GroupPage() {
       <InviteModal
         isOpen={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
-        inviteCode={inviteCode}
       />
     </div>
   );

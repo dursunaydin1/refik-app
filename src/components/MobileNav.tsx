@@ -10,7 +10,6 @@ export default function MobileNav() {
   const pathname = usePathname();
   const { user } = useUser();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [inviteCode, setInviteCode] = useState("...");
 
   const navItems = [
     { icon: "dashboard", label: "Panel", path: "/dashboard" },
@@ -20,19 +19,8 @@ export default function MobileNav() {
     { icon: "share", label: "Davet", action: "invite", adminOnly: true },
   ];
 
-  const handleOpenInvite = async () => {
+  const handleOpenInvite = () => {
     setIsInviteOpen(true);
-    if (user?.id) {
-      try {
-        const res = await fetch(`/api/group/invite-code?userId=${user.id}`);
-        const data = await res.json();
-        if (data.inviteCode) {
-          setInviteCode(data.inviteCode);
-        }
-      } catch (err) {
-        console.error("Davet kodu alınamadı:", err);
-      }
-    }
   };
 
   return (
@@ -77,7 +65,6 @@ export default function MobileNav() {
       <InviteModal
         isOpen={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
-        inviteCode={inviteCode}
       />
     </>
   );

@@ -13,7 +13,6 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useUser();
   const [isInviteOpen, setIsInviteOpen] = useState(false);
-  const [inviteCode, setInviteCode] = useState("...");
 
   const navItems = [
     { icon: "dashboard", label: "Panel", path: "/dashboard" },
@@ -27,19 +26,8 @@ export default function Sidebar() {
     router.push("/");
   };
 
-  const handleOpenInvite = async () => {
+  const handleOpenInvite = () => {
     setIsInviteOpen(true);
-    if (user?.id) {
-      try {
-        const res = await fetch(`/api/group/invite-code?userId=${user.id}`);
-        const data = await res.json();
-        if (data.inviteCode) {
-          setInviteCode(data.inviteCode);
-        }
-      } catch (err) {
-        console.error("Davet kodu alınamadı:", err);
-      }
-    }
   };
 
   return (
@@ -94,7 +82,6 @@ export default function Sidebar() {
       <InviteModal
         isOpen={isInviteOpen}
         onClose={() => setIsInviteOpen(false)}
-        inviteCode={inviteCode}
       />
     </>
   );

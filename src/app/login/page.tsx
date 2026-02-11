@@ -1,23 +1,80 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { useUser } from "@/context/UserContext";
+import { motion, AnimatePresence } from "framer-motion";
 
 /**
- * Login Page
+ * Modern Secure Login Page
  *
- * Simple authentication using Name and Phone Number. (Strictly Passwordless)
- * Admin accounts are blocked here and redirected to /admin/login.
+ * Features:
+ * 1. Phone number gating (Only invited members)
+ * 2. Password requirement for ACTIVE users
+ * 3. Redirect guidance for PENDING users
+ * 4. Persistent sessions (via UserContext/Cookies)
  */
 export default function LoginPage() {
   const router = useRouter();
-  const { login } = useUser();
-  const [name, setName] = useState("");
+  const { login, user: currentUser } = useUser();
+
+  const [step, setStep] = useState<1 | 2>(1); // 1: Phone, 2: Password
+  const [name, setName] = useState(""); // Still allowed for backward compat if needed, but unused in gate
   const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // If already logged in, skip login page
+  useEffect(() => {
+    if (currentUser) {
+      router.push("/dashboard");
+    }
+  }, [currentUser, router]);
+
+  const handleNextStep = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Step 1: Check if phone is authorized and get status
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phoneNumber: phone }),
+      });
+
+      const data = await res.json();
+
+      if (res.status === 403) {
+        // Gated: Not invited or Pending
+        if (data.status === "PENDING") {
+          setError(
+            "Hesabınız henüz aktif değil. Lütfen davet linkinizi kullanın.",
+          );
+        } else {
+          setError(
+            "Bu numara kayıtlı değil. Lütfen yöneticinizden davet isteyin.",
+          );
+        }
+        return;
+      }
+
+      // If we reach here, it means the user is ACTIVE and needs a password
+      // or there was a server error
+      if (!res.ok && res.status !== 401) {
+        throw new Error(data.error || "Bir hata oluştu.");
+      }
+
+      setStep(2);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,24 +85,16 @@ export default function LoginPage() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Regular users don't send a password
-        body: JSON.stringify({ name, phoneNumber: phone }),
+        body: JSON.stringify({ phoneNumber: phone, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        // If the error indicates an admin account is trying to sign in,
-        // we can provide a helpful hint to use the admin login.
-        if (response.status === 401 && data.error?.includes("Yönetici")) {
-          throw new Error(
-            "Bu numara yönetici hesabına aittir. Lütfen Yönetici Girişi'ni kullanın.",
-          );
-        }
         throw new Error(data.error || "Giriş başarısız.");
       }
 
-      // Success! Persist session in context
+      // Success! Persist session
       login(data.user);
       router.push("/dashboard");
     } catch (err: any) {
@@ -63,121 +112,172 @@ export default function LoginPage() {
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px]"></div>
       </div>
 
-      <div className="w-full max-w-md space-y-8 relative z-10 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+      <div className="w-full max-w-md space-y-8 relative z-10">
         {/* Logo and Header */}
-        <div className="flex flex-col items-center text-center space-y-4">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center text-center space-y-4"
+        >
           <div className="flex flex-col items-center gap-1">
             <Logo size={90} showText={false} />
             <h1 className="text-6xl font-black text-white font-display tracking-[-0.05em]">
-              Refik
+              Re<span className="text-primary">fik</span>
             </h1>
           </div>
-          <div className="space-y-1">
-            <p className="text-foreground-muted font-display text-base tracking-wide">
-              Huzur dolu bir hasbihal için seni bekliyoruz.
-            </p>
-          </div>
-        </div>
+          <p className="text-foreground-muted font-display text-base tracking-wide">
+            {step === 1
+              ? "Hoş geldiniz, devam etmek için numaranızı girin."
+              : "Güvenliğiniz için şifrenizi girin."}
+          </p>
+        </motion.div>
 
         {/* Login Form */}
-        <form
-          onSubmit={handleLogin}
-          className="bg-surface border border-border rounded-3xl p-8 space-y-6 shadow-2xl"
+        <motion.div
+          layout
+          className="bg-surface border border-border rounded-3xl p-8 space-y-6 shadow-2xl relative overflow-hidden"
         >
-          <div className="space-y-4">
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-xl flex items-center gap-2 animate-in fade-in zoom-in-95">
-                <span className="material-symbols-outlined text-base">
-                  error
-                </span>
-                {error}
-              </div>
-            )}
-
-            {/* Name Input */}
-            <div className="space-y-2">
-              <label
-                htmlFor="name"
-                className="text-sm font-bold text-primary uppercase tracking-widest font-display pl-1"
+          <AnimatePresence mode="wait">
+            {step === 1 ? (
+              <motion.form
+                key="step1"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                onSubmit={handleNextStep}
+                className="space-y-6"
               >
-                Ad Soyad
-              </label>
-              <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors">
-                  person
-                </span>
-                <input
-                  id="name"
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Adınız Soyadınız"
-                  required
-                  className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 hover:border-primary/30 transition-all font-display placeholder:text-foreground-muted/50 cursor-text"
-                />
-              </div>
-            </div>
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl flex items-center gap-2">
+                    <span className="material-symbols-outlined text-base">
+                      error
+                    </span>
+                    {error}
+                  </div>
+                )}
 
-            {/* Phone Input */}
-            <div className="space-y-2">
-              <label
-                htmlFor="phone"
-                className="text-sm font-bold text-primary uppercase tracking-widest font-display pl-1"
-              >
-                Telefon Numarası
-              </label>
-              <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors">
-                  call
-                </span>
-                <input
-                  id="phone"
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="05xx xxx xx xx"
-                  required
-                  className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 hover:border-primary/30 transition-all font-display placeholder:text-foreground-muted/50 cursor-text"
-                />
-              </div>
-            </div>
-          </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-primary uppercase tracking-widest font-display pl-1">
+                    Telefon Numarası
+                  </label>
+                  <div className="relative group">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary">
+                      call
+                    </span>
+                    <input
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="05xx xxx xx xx"
+                      required
+                      autoFocus
+                      className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display placeholder:text-foreground-muted/50"
+                    />
+                  </div>
+                </div>
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all font-display disabled:opacity-50 cursor-pointer shadow-lg hover:shadow-primary/30"
-          >
-            {isLoading ? (
-              <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  {isLoading ? (
+                    <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <span>Devam Et</span>
+                      <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
+                        arrow_forward
+                      </span>
+                    </>
+                  )}
+                </button>
+              </motion.form>
             ) : (
-              <>
-                <span>Giriş Yap</span>
-                <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
-                  login
-                </span>
-              </>
-            )}
-          </button>
+              <motion.form
+                key="step2"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                onSubmit={handleLogin}
+                className="space-y-6"
+              >
+                {error && (
+                  <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl flex items-center gap-2">
+                    <span className="material-symbols-outlined text-base">
+                      lock_reset
+                    </span>
+                    {error}
+                  </div>
+                )}
 
-          <p className="text-[10px] text-center text-foreground-muted uppercase tracking-wider font-bold italic leading-relaxed">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-bold text-primary uppercase tracking-widest font-display pl-1">
+                      Şifre
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setStep(1)}
+                      className="text-[10px] text-foreground-muted hover:text-white transition-colors"
+                    >
+                      Numarayı Değiştir
+                    </button>
+                  </div>
+                  <div className="relative group">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary">
+                      lock
+                    </span>
+                    <input
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      autoFocus
+                      className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display placeholder:text-foreground-muted/50"
+                    />
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all"
+                >
+                  {isLoading ? (
+                    <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
+                  ) : (
+                    <>
+                      <span>Giriş Yap</span>
+                      <span className="material-symbols-outlined ml-2">
+                        login
+                      </span>
+                    </>
+                  )}
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
+
+          <p className="text-[10px] text-center text-foreground-muted uppercase tracking-wider font-bold italic opacity-60">
             "Sizin en hayırlınız, Kur'an'ı öğrenen ve öğretendir."
           </p>
-        </form>
+        </motion.div>
 
         {/* Admin Link at the bottom */}
-        <div className="text-center">
+        <div className="text-center opacity-50 hover:opacity-100 transition-opacity">
           <button
             onClick={() => router.push("/admin/login")}
-            className="text-xs text-foreground-muted/50 hover:text-primary transition-colors font-display uppercase tracking-widest border-b border-white/5 pb-1 cursor-pointer"
+            className="text-xs text-foreground-muted hover:text-primary transition-colors font-display uppercase tracking-widest border-b border-white/5 pb-1"
           >
-            Yönetici Paneli Girişi
+            Yönetici Girişi
           </button>
         </div>
       </div>
 
       {/* Footer Branding */}
-      <div className="fixed bottom-8 left-0 right-0 flex justify-center opacity-20 text-[10px] font-bold uppercase tracking-[0.4em] pointer-events-none">
+      <div className="fixed bottom-8 left-0 right-0 flex justify-center opacity-10 text-[10px] font-bold uppercase tracking-[0.4em] pointer-events-none">
         Refik Spiritual Companion
       </div>
     </div>

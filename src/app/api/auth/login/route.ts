@@ -2,15 +2,9 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 
-/**
- * Login API Route
- *
- * Handles authentication via Name & Phone Number.
- * Now requires PASSWORD for ADMIN role.
- */
 export async function POST(request: Request) {
   try {
-    const { name, phoneNumber, password } = await request.json();
+    const { phoneNumber, password } = await request.json();
 
     if (!phoneNumber) {
       return NextResponse.json(
@@ -31,133 +25,76 @@ export async function POST(request: Request) {
       where: { phoneNumber: trimmedPhone },
     });
 
-    if (!user && !name) {
+    // GATE: If user is not in the system, deny access
+    if (!user) {
       return NextResponse.json(
-        { error: "Yeni kullanıcılar için isim gereklidir." },
-        { status: 400 },
+        {
+          error:
+            "Bu numara kayıtlı değil. Lütfen yöneticinizden davet isteyin.",
+        },
+        { status: 403 },
       );
     }
 
-    // Determine if this attempt is for an Admin role
-    const isTargetingAdmin = user ? user.role === "ADMIN" : isAdminByPhone;
-
-    if (isTargetingAdmin) {
+    // Handle ACTIVE users (Admin or already activated members)
+    if (user.status === "ACTIVE") {
       if (!password) {
         return NextResponse.json(
-          { error: "Yönetici girişi için şifre gereklidir." },
+          { error: "Şifre gereklidir." },
           { status: 401 },
         );
       }
 
+      // Special case: Admin first time or setup from ENV
       const defaultAdminPassword = process.env.ADMIN_PASSWORD || "admin123";
-
-      if (user && user.password) {
-        // Verify existing password
-        const isValid = await bcrypt.compare(password, user.password);
-        if (!isValid) {
-          return NextResponse.json({ error: "Hatalı şifre." }, { status: 401 });
-        }
-      } else {
-        // First time admin or no password set: setup from ENV
-        if (password !== defaultAdminPassword) {
+      if (isAdminByPhone && !user.password) {
+        if (password === defaultAdminPassword) {
+          // First time setup: hash and save
+          const hashedPassword = await bcrypt.hash(password, 10);
+          user = await prisma.user.update({
+            where: { id: user.id },
+            data: { password: hashedPassword },
+          });
+        } else {
           return NextResponse.json(
             { error: "İlk kurulum şifresi hatalı." },
             { status: 401 },
           );
         }
-        // Will be hashed and saved below during create or update
+      } else if (user.password) {
+        const isValid = await bcrypt.compare(password, user.password);
+        if (!isValid) {
+          return NextResponse.json({ error: "Hatalı şifre." }, { status: 401 });
+        }
       }
+    } else if (user.status === "PENDING") {
+      return NextResponse.json(
+        {
+          status: "PENDING",
+          message:
+            "Hesabınız henüz aktif değil. Lütfen size gönderilen davet linkini kullanın.",
+        },
+        { status: 403 },
+      );
     }
 
-    // -------------------------------------------------------------------------
-    // GROUP CREATION & ASSIGNMENT LOGIC
-    // -------------------------------------------------------------------------
+    // Update group assignment if missing
     let defaultGroup = await prisma.group.findFirst();
-
-    // If no group exists and this is an Admin, create the default "Refik Grubu"
-    if (!defaultGroup && isTargetingAdmin) {
-      // We need a user ID to create a group (as adminId)
-      // If user doesn't exist yet, we'll create the user first, then the group.
-      // If user exists, we use their ID.
-      const adminUserId = user ? user.id : null;
-
-      if (adminUserId) {
-        defaultGroup = await prisma.group.create({
-          data: {
-            name: "Refik Grubu",
-            inviteCode: "REFIK2026",
-            adminId: adminUserId,
-          },
-        });
-      }
-    }
-
-    if (!user) {
-      // Create new user
-      const hashedPassword = isTargetingAdmin
-        ? await bcrypt.hash(password, 10)
-        : null;
-
-      user = await prisma.user.create({
+    if (!defaultGroup && user.role === "ADMIN") {
+      defaultGroup = await prisma.group.create({
         data: {
-          name,
-          phoneNumber: trimmedPhone,
-          role: isAdminByPhone ? "ADMIN" : "USER",
-          password: hashedPassword,
-          // Assign to group if one exists
-          groupId: defaultGroup ? defaultGroup.id : null,
+          name: "Refik Grubu",
+          inviteCode: "REFIK2026",
+          adminId: user.id,
         },
       });
+    }
 
-      // Special case: if this was the FIRST admin and we just created them,
-      // create the group now that we have their ID.
-      if (!defaultGroup && isAdminByPhone) {
-        defaultGroup = await prisma.group.create({
-          data: {
-            name: "Refik Grubu",
-            inviteCode: "REFIK2026",
-            adminId: user.id,
-          },
-        });
-
-        // Update user with the newly created group ID
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: { groupId: defaultGroup.id },
-        });
-      }
-    } else {
-      // User exists, update role, password, or group if needed
-      const updateData: any = {};
-      let needsUpdate = false;
-
-      if (user.role !== "ADMIN" && isAdminByPhone) {
-        updateData.role = "ADMIN";
-        needsUpdate = true;
-      }
-
-      if (isTargetingAdmin && !user.password) {
-        updateData.password = await bcrypt.hash(password, 10);
-        needsUpdate = true;
-      }
-
-      // Important: Assign to group if they don't have one
-      if (!user.groupId && defaultGroup) {
-        updateData.groupId = defaultGroup.id;
-        needsUpdate = true;
-      }
-
-      if (name && user.name !== name) {
-        updateData.name = name;
-        needsUpdate = true;
-      }
-
-      if (needsUpdate) {
-        user = await prisma.user.update({
-          where: { id: user.id },
-          data: updateData,
-        });
-      }
+    if (!user.groupId && defaultGroup) {
+      user = await prisma.user.update({
+        where: { id: user.id },
+        data: { groupId: defaultGroup.id },
+      });
     }
 
     return NextResponse.json({
