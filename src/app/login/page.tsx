@@ -5,6 +5,14 @@ import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { useUser } from "@/context/UserContext";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  Phone,
+  ArrowRight,
+  Lock,
+  KeyRound,
+  LogIn,
+  AlertCircle,
+} from "lucide-react";
 
 /**
  * Modern Secure Login Page
@@ -149,9 +157,7 @@ export default function LoginPage() {
               >
                 {error && (
                   <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl flex items-center gap-2">
-                    <span className="material-symbols-outlined text-base">
-                      error
-                    </span>
+                    <AlertCircle className="w-4 h-4" />
                     {error}
                   </div>
                 )}
@@ -161,9 +167,7 @@ export default function LoginPage() {
                     Telefon Numarası
                   </label>
                   <div className="relative group">
-                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary">
-                      call
-                    </span>
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary w-5 h-5" />
                     <input
                       type="tel"
                       value={phone}
@@ -186,9 +190,7 @@ export default function LoginPage() {
                   ) : (
                     <>
                       <span>Devam Et</span>
-                      <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
-                        arrow_forward
-                      </span>
+                      <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
                     </>
                   )}
                 </button>
@@ -204,9 +206,7 @@ export default function LoginPage() {
               >
                 {error && (
                   <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-4 rounded-xl flex items-center gap-2">
-                    <span className="material-symbols-outlined text-base">
-                      lock_reset
-                    </span>
+                    <AlertCircle className="w-4 h-4" />
                     {error}
                   </div>
                 )}
@@ -225,9 +225,7 @@ export default function LoginPage() {
                     </button>
                   </div>
                   <div className="relative group">
-                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary">
-                      lock
-                    </span>
+                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary w-5 h-5" />
                     <input
                       type="password"
                       value={password}
@@ -250,9 +248,7 @@ export default function LoginPage() {
                   ) : (
                     <>
                       <span>Giriş Yap</span>
-                      <span className="material-symbols-outlined ml-2">
-                        login
-                      </span>
+                      <LogIn className="ml-2 w-5 h-5" />
                     </>
                   )}
                 </button>

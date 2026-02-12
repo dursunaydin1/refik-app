@@ -1,6 +1,7 @@
 import React from "react";
 import Logo from "@/components/Logo";
 import { MOCK_INVITER, MOCK_FEATURES } from "@/lib/mockData";
+import { Sparkles, ArrowRight, Users, Zap, Heart } from "lucide-react";
 
 /**
  * Landing Page (Giriş/Karşılama Sayfası)
@@ -8,6 +9,20 @@ import { MOCK_INVITER, MOCK_FEATURES } from "@/lib/mockData";
  * This is the first screen users see when they visit the site or click an invite link.
  */
 export default function LandingPage() {
+  // Icon mapping for mock features
+  const getIcon = (iconName: string) => {
+    switch (iconName) {
+      case "groups":
+        return <Users className="w-6 h-6 text-primary" />;
+      case "auto_awesome":
+        return <Zap className="w-6 h-6 text-primary" />;
+      case "volunteer_activism":
+        return <Heart className="w-6 h-6 text-primary" />;
+      default:
+        return <Sparkles className="w-6 h-6 text-primary" />;
+    }
+  };
+
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden gradient-mesh">
       {/* Background Decorative Elements */}
@@ -30,8 +45,8 @@ export default function LandingPage() {
           <div className="max-w-2xl w-full text-center space-y-12">
             {/* Hero Section */}
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium font-display">
-                <span className="material-symbols-outlined text-sm">stars</span>
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium font-display mx-auto">
+                <Sparkles className="w-4 h-4" />
                 Ramazan Yolculuğu
               </div>
 
@@ -65,9 +80,7 @@ export default function LandingPage() {
                 className="group relative flex items-center justify-center w-full max-w-sm h-16 bg-primary text-background-dark rounded-xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all font-display cursor-pointer"
               >
                 <span className="truncate">Katıl ve Başla</span>
-                <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
-                  arrow_forward
-                </span>
+                <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
               </a>
               <p className="text-sm text-foreground-muted max-w-xs mx-auto italic font-display">
                 "Huzurlu, yargısız ve samimi bir okuma deneyimi için
@@ -83,17 +96,17 @@ export default function LandingPage() {
             {MOCK_FEATURES.map((feature) => (
               <div
                 key={feature.id}
-                className="p-6 rounded-xl bg-surface border border-border space-y-3 transition-colors hover:bg-surface-hover"
+                className="p-6 rounded-xl bg-surface border border-border space-y-4 transition-colors hover:bg-surface-hover"
               >
-                <span className="material-symbols-outlined text-primary">
-                  {feature.icon}
-                </span>
-                <h3 className="font-bold text-lg text-white font-display">
-                  {feature.title}
-                </h3>
-                <p className="text-sm text-foreground-muted font-display">
-                  {feature.description}
-                </p>
+                {getIcon(feature.icon)}
+                <div className="space-y-1">
+                  <h3 className="font-bold text-lg text-white font-display">
+                    {feature.title}
+                  </h3>
+                  <p className="text-sm text-foreground-muted font-display leading-relaxed">
+                    {feature.description}
+                  </p>
+                </div>
               </div>
             ))}
           </div>

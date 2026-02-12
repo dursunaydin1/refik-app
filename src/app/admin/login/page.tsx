@@ -4,6 +4,13 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Logo from "@/components/Logo";
 import { useUser } from "@/context/UserContext";
+import {
+  Phone,
+  Lock,
+  LockKeyholeOpen,
+  ArrowLeft,
+  AlertCircle,
+} from "lucide-react";
 
 /**
  * Admin Login Page
@@ -86,9 +93,7 @@ export default function AdminLoginPage() {
           <div className="space-y-4 pt-4">
             {error && (
               <div className="bg-red-500/10 border border-red-500/20 text-red-400 text-sm p-3 rounded-xl flex items-center gap-2 animate-in fade-in zoom-in-95">
-                <span className="material-symbols-outlined text-base">
-                  error
-                </span>
+                <AlertCircle className="w-4 h-4" />
                 {error}
               </div>
             )}
@@ -102,9 +107,7 @@ export default function AdminLoginPage() {
                 Telefon Numarası
               </label>
               <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors">
-                  call
-                </span>
+                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors w-5 h-5" />
                 <input
                   id="phone"
                   type="tel"
@@ -126,9 +129,7 @@ export default function AdminLoginPage() {
                 Yönetici Şifresi
               </label>
               <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors">
-                  lock
-                </span>
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors w-5 h-5" />
                 <input
                   id="password"
                   type="password"
@@ -152,9 +153,7 @@ export default function AdminLoginPage() {
             ) : (
               <>
                 <span>Oturumu Başlat</span>
-                <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
-                  lock_open
-                </span>
+                <LockKeyholeOpen className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
               </>
             )}
           </button>
@@ -165,9 +164,7 @@ export default function AdminLoginPage() {
             onClick={() => router.push("/login")}
             className="text-foreground-muted hover:text-white transition-colors flex items-center justify-center gap-1 mx-auto cursor-pointer"
           >
-            <span className="material-symbols-outlined text-sm">
-              arrow_back
-            </span>
+            <ArrowLeft className="w-4 h-4" />
             Standart Giriş Sayfasına Dön
           </button>
         </p>

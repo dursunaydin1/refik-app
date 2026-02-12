@@ -20,25 +20,46 @@ export async function POST(request: Request) {
     ).trim();
     const isAdminByPhone = trimmedPhone === configuredAdminPhone;
 
+    /*
+    console.log("Login Attempt:", {
+      trimmedPhone,
+      configuredAdminPhone,
+      isAdminByPhone,
+    });
+    */
+
     // Find User
     let user = await prisma.user.findUnique({
       where: { phoneNumber: trimmedPhone },
     });
 
-    // BOOTSTRAP: If this is the configured admin and doesn't exist, create them
-    if (!user && isAdminByPhone) {
-      user = await prisma.user.create({
-        data: {
-          phoneNumber: trimmedPhone,
-          name: "Admin",
-          role: "ADMIN",
-          status: "ACTIVE",
-        },
-      });
+    // BOOTSTRAP/UPGRADE: Ensure the configured admin is always ACTIVE and has ADMIN role
+    if (isAdminByPhone) {
+      if (!user) {
+        // console.log("Bootstrapping Admin User...");
+        user = await prisma.user.create({
+          data: {
+            phoneNumber: trimmedPhone,
+            name: "Admin",
+            role: "ADMIN",
+            status: "ACTIVE",
+          },
+        });
+      } else if (user.role !== "ADMIN" || user.status !== "ACTIVE") {
+        // console.log("Upgrading existing user to Admin...");
+        user = await prisma.user.update({
+          where: { id: user.id },
+          data: {
+            role: "ADMIN",
+            status: "ACTIVE",
+          },
+        });
+      }
     }
 
     // GATE: If user is not in the system, deny access
     if (!user) {
+      // console.log("Access Denied: User not found", trimmedPhone);
       return NextResponse.json(
         {
           error:
