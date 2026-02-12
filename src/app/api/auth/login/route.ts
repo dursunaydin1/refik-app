@@ -25,6 +25,18 @@ export async function POST(request: Request) {
       where: { phoneNumber: trimmedPhone },
     });
 
+    // BOOTSTRAP: If this is the configured admin and doesn't exist, create them
+    if (!user && isAdminByPhone) {
+      user = await prisma.user.create({
+        data: {
+          phoneNumber: trimmedPhone,
+          name: "Admin",
+          role: "ADMIN",
+          status: "ACTIVE",
+        },
+      });
+    }
+
     // GATE: If user is not in the system, deny access
     if (!user) {
       return NextResponse.json(

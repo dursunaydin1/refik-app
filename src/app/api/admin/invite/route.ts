@@ -27,7 +27,7 @@ export async function POST(request: Request) {
           { status: 400 },
         );
       }
-      
+
       // If user is pending, we can re-generate the token
       const newToken = crypto.randomBytes(32).toString("hex");
       const updatedUser = await prisma.user.update({
@@ -63,8 +63,12 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     console.error("Invite API Error:", error);
+    // Return specific error message for easier debugging if possible
     return NextResponse.json(
-      { error: "Davet oluşturulurken bir hata oluştu." },
+      {
+        error: "Davet oluşturulurken sunucu hatası oluştu.",
+        details: error.message || "Bilinmeyen hata",
+      },
       { status: 500 },
     );
   }

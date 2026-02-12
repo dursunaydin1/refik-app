@@ -25,6 +25,24 @@ export async function POST(request: Request) {
       updateData.name = name;
     }
 
+    // Update Password
+    if (password && currentPassword) {
+      // If user already has a password, verify it
+      if (user.password) {
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+          return NextResponse.json(
+            { error: "Mevcut şifre hatalı." },
+            { status: 401 },
+          );
+        }
+      }
+
+      // Hash and set new password
+      updateData.password = await bcrypt.hash(password, 10);
+      updateData.status = "ACTIVE"; // Ensure they are active if they set a password
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
       data: updateData,

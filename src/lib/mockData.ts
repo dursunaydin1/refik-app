@@ -11,8 +11,7 @@ export const MOCK_APP_STATE = {
 
 export const MOCK_INVITER = {
   name: "Dursun AYDIN",
-  avatarUrl:
-    "https://lh3.googleusercontent.com/aida-public/AB6AXuCMcnxE5O2UNtO9NG5K2MOu1MnYVv6GUBVDj281afr8cwEGtapaeCPJ7qQ1MeWps_MCiAFr2YEbqyMiTKbI-Eo_N3btenZsaFQOjUX2ZlepAVBHcNDUMfjsq72dTLEUozkT9bAlGZZcArGRKgAIzeAbX2cpOPyWShxAXd3qig1R1W24ZDjHiOdpMPIgZ5cyNYP9pu22ky3i4yAbI7M7YDc0DbTcZEy23Th6cOSym7twGioP2666iYneNGS0O8MjbKl1AU331kfUQu_o",
+  avatarUrl: "/images/img.png",
 };
 
 export const MOCK_FEATURES = [

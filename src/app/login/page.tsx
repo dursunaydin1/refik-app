@@ -179,7 +179,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   {isLoading ? (
                     <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
@@ -219,7 +219,7 @@ export default function LoginPage() {
                     <button
                       type="button"
                       onClick={() => setStep(1)}
-                      className="text-[10px] text-foreground-muted hover:text-white transition-colors"
+                      className="text-[10px] text-foreground-muted hover:text-white transition-colors cursor-pointer"
                     >
                       Numarayı Değiştir
                     </button>
@@ -243,7 +243,7 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all"
+                  className="group relative flex items-center justify-center w-full h-16 bg-primary text-background-dark rounded-2xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
                 >
                   {isLoading ? (
                     <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
@@ -269,7 +269,7 @@ export default function LoginPage() {
         <div className="text-center opacity-50 hover:opacity-100 transition-opacity">
           <button
             onClick={() => router.push("/admin/login")}
-            className="text-xs text-foreground-muted hover:text-primary transition-colors font-display uppercase tracking-widest border-b border-white/5 pb-1"
+            className="text-xs text-foreground-muted hover:text-primary transition-colors font-display uppercase tracking-widest border-b border-white/5 pb-1 cursor-pointer"
           >
             Yönetici Girişi
           </button>

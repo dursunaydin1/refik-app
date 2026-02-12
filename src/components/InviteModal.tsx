@@ -47,22 +47,16 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
     }
   };
 
-  const handleCopy = async () => {
-    try {
-      const shareText = `Selam ${name}! Refik'e davet edildin. Hesabını bu link üzerinden aktifleştirebilirsin:\n\n${inviteLink}`;
-      await navigator.clipboard.writeText(shareText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Kopyalama başarısız:", err);
-    }
-  };
-
-  const resetAndClose = () => {
+  const resetForm = () => {
     setName("");
     setPhoneNumber("");
     setInviteLink("");
     setStatus("idle");
+    setError("");
+  };
+
+  const resetAndClose = () => {
+    resetForm();
     onClose();
   };
 
@@ -200,7 +194,7 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
                 </button>
 
                 <button
-                  onClick={() => setStatus("idle")}
+                  onClick={resetForm}
                   className="w-full text-center text-xs text-foreground-muted hover:text-white transition-colors uppercase tracking-widest font-bold pt-2 cursor-pointer"
                 >
                   Yeni Bir Üye Daha Ekle

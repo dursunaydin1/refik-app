@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
 datasource db {
@@ -10,42 +8,42 @@ datasource db {
 }
 
 model User {
-  id               String     @id @default(uuid())
-  phoneNumber      String     @unique
-  password         String?    // Required after activation
-  name             String
-  role             String     @default("USER") // "USER" | "ADMIN"
-  status           String     @default("PENDING") // "PENDING" | "ACTIVE"
-  activationToken  String?    @unique // One-time token for new users
-  tokenExpires     DateTime?
-  groupId          String?
-  group            Group?     @relation("GroupMembers", fields: [groupId], references: [id])
-  administeredGroup Group?     @relation("GroupAdmin")
-  progress         Progress[]
-  subscriptions    PushSubscription[]
-  createdAt        DateTime   @default(now())
-  updatedAt        DateTime   @updatedAt
+  id                String             @id @default(uuid())
+  phoneNumber       String             @unique
+  password          String?
+  name              String
+  role              String             @default("USER")
+  status            String             @default("PENDING")
+  activationToken   String?            @unique
+  tokenExpires      DateTime?
+  groupId           String?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+  administeredGroup Group?             @relation("GroupAdmin")
+  progress          Progress[]
+  subscriptions     PushSubscription[]
+  group             Group?             @relation("GroupMembers", fields: [groupId], references: [id])
 }
 
 model Group {
-  id               String     @id @default(uuid())
+  id               String   @id @default(uuid())
   name             String
-  inviteCode       String     @unique
-  adminId          String     @unique
-  admin            User       @relation("GroupAdmin", fields: [adminId], references: [id])
-  members          User[]     @relation("GroupMembers")
-  notificationTime String     @default("18:30")
-  createdAt        DateTime   @default(now())
+  inviteCode       String   @unique
+  adminId          String   @unique
+  notificationTime String   @default("18:30")
+  createdAt        DateTime @default(now())
+  admin            User     @relation("GroupAdmin", fields: [adminId], references: [id])
+  members          User[]   @relation("GroupMembers")
 }
 
 model Progress {
   id           String   @id @default(uuid())
   userId       String
-  user         User     @relation(fields: [userId], references: [id])
-  day          Int      // Ramadan day (1-30)
-  lastReadPage Int      @default(0) // 0-603
+  day          Int
+  lastReadPage Int      @default(0)
   isCompleted  Boolean  @default(false)
   updatedAt    DateTime @updatedAt
+  user         User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, day])
 }
@@ -53,11 +51,11 @@ model Progress {
 model PushSubscription {
   id        String   @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
   endpoint  String
   p256dh    String
   auth      String
   createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, endpoint])
 }

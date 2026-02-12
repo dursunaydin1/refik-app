@@ -149,7 +149,7 @@ function ActivationForm() {
         <button
           type="submit"
           disabled={status === "loading" || !token}
-          className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-200 active:scale-95 disabled:opacity-50 flex justify-center items-center gap-2"
+          className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-emerald-200 active:scale-95 disabled:opacity-50 flex justify-center items-center gap-2 cursor-pointer"
         >
           {status === "loading" ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -174,6 +174,16 @@ export default function ActivatePage() {
           <span className="text-4xl font-bold tracking-tight text-gray-900 font-outfit">
             Re<span className="text-emerald-600">fik</span>
           </span>
+
+          <div className="mt-8 mb-4">
+            <div className="w-24 h-24 rounded-full border-4 border-emerald-50 overflow-hidden shadow-inner bg-gray-100">
+              <img
+                src="/images/img.png"
+                alt="Dursun AYDIN"
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
         </div>
 
         <Suspense

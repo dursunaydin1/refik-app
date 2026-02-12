@@ -20,7 +20,7 @@ export default function LandingPage() {
         {/* Header */}
         <header className="w-full max-w-5xl mx-auto px-6 py-8 flex justify-between items-center">
           <Logo />
-          <button className="text-sm font-medium text-foreground-muted hover:text-primary transition-colors font-display">
+          <button className="text-sm font-medium text-foreground-muted hover:text-primary transition-colors font-display cursor-pointer">
             Hakkımızda
           </button>
         </header>
@@ -41,9 +41,9 @@ export default function LandingPage() {
 
               {/* Inviter Info (Mock Data) */}
               <div className="flex flex-col items-center gap-4">
-                <div className="flex -space-x-2">
+                <div className="relative">
                   <img
-                    className="w-10 h-10 rounded-full border-2 border-background-dark"
+                    className="w-20 h-20 md:w-24 md:h-24 rounded-full border-4 border-emerald-500/20 shadow-xl object-cover"
                     src={MOCK_INVITER.avatarUrl}
                     alt={MOCK_INVITER.name}
                   />
@@ -62,7 +62,7 @@ export default function LandingPage() {
             <div className="flex flex-col items-center gap-6 text-center">
               <a
                 href="/login"
-                className="group relative flex items-center justify-center w-full max-w-sm h-16 bg-primary text-background-dark rounded-xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all font-display"
+                className="group relative flex items-center justify-center w-full max-w-sm h-16 bg-primary text-background-dark rounded-xl font-bold text-lg glow-primary hover:scale-[1.02] active:scale-[0.98] transition-all font-display cursor-pointer"
               >
                 <span className="truncate">Katıl ve Başla</span>
                 <span className="material-symbols-outlined ml-2 transition-transform group-hover:translate-x-1">
