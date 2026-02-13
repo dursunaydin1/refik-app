@@ -88,30 +88,50 @@ export async function POST(request: Request) {
 
     // Handle ACTIVE users (Admin or already activated members)
     if (user.status === "ACTIVE") {
-      if (!password) {
-        return NextResponse.json(
-          { error: "Şifre gereklidir." },
-          { status: 401 },
-        );
-      }
-
-      // Special case: Admin first time or setup from ENV
+      // 1. Admin Logic (Always requires password)
       const defaultAdminPassword = process.env.ADMIN_PASSWORD || "admin123";
-      if (isAdminByPhone && !user.password) {
-        if (password === defaultAdminPassword) {
-          // First time setup: hash and save
-          const hashedPassword = await bcrypt.hash(password, 10);
-          user = await prisma.user.update({
-            where: { id: user.id },
-            data: { password: hashedPassword },
-          });
-        } else {
+
+      if (isAdminByPhone) {
+        if (!password) {
           return NextResponse.json(
-            { error: "İlk kurulum şifresi hatalı." },
+            { error: "Yönetici şifresi gereklidir.", needsPassword: true },
             { status: 401 },
           );
         }
-      } else if (user.password) {
+
+        if (!user.password) {
+          // First time setup: hash and save
+          if (password === defaultAdminPassword) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            user = await prisma.user.update({
+              where: { id: user.id },
+              data: { password: hashedPassword },
+            });
+          } else {
+            return NextResponse.json(
+              { error: "İlk kurulum şifresi hatalı." },
+              { status: 401 },
+            );
+          }
+        } else {
+          // Verify existing hashed password
+          const isValid = await bcrypt.compare(password, user.password);
+          if (!isValid) {
+            return NextResponse.json(
+              { error: "Hatalı şifre." },
+              { status: 401 },
+            );
+          }
+        }
+      }
+      // 2. Regular User Logic (Only requires password if set)
+      else if (user.password) {
+        if (!password) {
+          return NextResponse.json(
+            { error: "Şifre gereklidir.", needsPassword: true },
+            { status: 401 },
+          );
+        }
         const isValid = await bcrypt.compare(password, user.password);
         if (!isValid) {
           return NextResponse.json({ error: "Hatalı şifre." }, { status: 401 });

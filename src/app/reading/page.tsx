@@ -4,6 +4,8 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import ReadingHeader from "@/components/ReadingHeader";
 import ReadingFooter from "@/components/ReadingFooter";
+import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
 import { fetchJuz, type JuzData } from "@/lib/quranService";
 import {
   getRamadanDay,
@@ -13,10 +15,19 @@ import {
 import { Clock, ArrowLeft, AlertCircle, Star, Sparkles } from "lucide-react";
 
 function ReadingContent() {
+  const router = useRouter();
+  const { user, isLoading: authLoading } = useUser();
   const searchParams = useSearchParams();
   const [juzData, setJuzData] = useState<JuzData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Auth check
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, authLoading, router]);
 
   // Determine the day from query param or from Ramadan calendar
   const dayParam = searchParams.get("day");

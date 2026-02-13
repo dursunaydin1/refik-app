@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
+/**
+ * Stats API Route
+ *
+ * Optimized to fetch only necessary data to avoid database locks.
+ */
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -10,75 +15,78 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "User ID required" }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({
+    // 1. Get User specifically for streak and total read
+    const userWithProgress = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
-        group: {
-          include: {
-            members: {
-              include: {
-                progress: true,
-              },
-            },
+      select: {
+        id: true,
+        groupId: true,
+        progress: {
+          orderBy: { day: "desc" },
+          select: {
+            day: true,
+            isCompleted: true,
+            updatedAt: true,
           },
         },
-        progress: true,
       },
     });
 
-    if (!user) {
+    if (!userWithProgress) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    // 1. Calculate Statistics
-    const totalPagesRead = user.progress.length; // Assuming 1 progress entry = 1 page/day completed
+    // 2. Calculate Statistics
+    const totalPagesRead = userWithProgress.progress.length;
 
     // Calculate Streak
-    // Sort progress by day descending
-    const sortedProgress = [...user.progress].sort((a, b) => b.day - a.day);
     let currentStreak = 0;
-    // This is a simplified streak calculation based on "day" numbers
-    // In a real calendar app, we'd check dates.
-    // Assuming 'day' increments by 1 for each day of Ramazan.
-    if (sortedProgress.length > 0) {
-      // Simple logic: if last read was today or yesterday (relative to max day in system), count streak
-      // For this MVP, we will just count consecutive progress entries from the latest one backwards
-      let lastDay = sortedProgress[0].day;
+    if (userWithProgress.progress.length > 0) {
+      let lastDay = userWithProgress.progress[0].day;
       currentStreak = 1;
-      for (let i = 1; i < sortedProgress.length; i++) {
-        if (sortedProgress[i].day === lastDay - 1) {
+      for (let i = 1; i < userWithProgress.progress.length; i++) {
+        if (userWithProgress.progress[i].day === lastDay - 1) {
           currentStreak++;
-          lastDay = sortedProgress[i].day;
+          lastDay = userWithProgress.progress[i].day;
         } else {
           break;
         }
       }
     }
 
-    // 2. Prepare Chart Data (Last 30 entries)
-    // We want to show activity. Map progress to a simple array.
-    // For recharts: [{ name: 'Gün 1', pages: 1 }, ...]
-    const chartData = user.progress
-      .sort((a, b) => a.day - b.day)
-      .slice(-30) // Last 30 records
+    // 3. Prepare Chart Data (Last 30 entries)
+    const chartData = [...userWithProgress.progress]
+      .reverse() // Back to ascending for chart
+      .slice(-30)
       .map((p) => ({
         name: `Gün ${p.day}`,
         completed: p.isCompleted ? 1 : 0,
         fullDate: p.updatedAt.toISOString(),
       }));
 
-    // 3. Leaderboard
-    // Rank group members by total pages read
+    // 4. Leaderboard (Sequential query)
     let leaderboard: any[] = [];
-    if (user.group) {
-      leaderboard = user.group.members
+    if (userWithProgress.groupId) {
+      const groupMembers = await prisma.user.findMany({
+        where: { groupId: userWithProgress.groupId },
+        select: {
+          id: true,
+          name: true,
+          progress: {
+            where: { isCompleted: true },
+            select: { id: true },
+          },
+        },
+      });
+
+      leaderboard = groupMembers
         .map((member) => ({
           id: member.id,
           name: member.name || "İsimsiz",
-          totalRead: member.progress.filter((p) => p.isCompleted).length,
+          totalRead: member.progress.length,
         }))
-        .sort((a, b) => b.totalRead - a.totalRead) // Descending
-        .slice(0, 5); // Top 5
+        .sort((a, b) => b.totalRead - a.totalRead)
+        .slice(0, 5);
     }
 
     return NextResponse.json({
@@ -90,6 +98,7 @@ export async function GET(request: Request) {
       leaderboard,
     });
   } catch (error: any) {
+    console.error("Stats API Error:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

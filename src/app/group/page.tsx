@@ -15,12 +15,18 @@ export default function GroupPage() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   useEffect(() => {
+    // Auth check
+    if (!user && !isLoading) {
+      router.push("/login");
+      return;
+    }
+
     if (user?.groupId) {
       fetchMembers();
     } else if (user) {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [user, router]);
 
   const fetchMembers = async () => {
     try {

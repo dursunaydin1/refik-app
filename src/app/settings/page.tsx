@@ -2,12 +2,14 @@
 
 import React, { useState, useEffect } from "react";
 import NotificationManager from "@/components/NotificationManager";
-import Link from "next/link";
 import { useUser } from "@/context/UserContext";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
 export default function SettingsPage() {
-  const { user, login } = useUser();
+  const router = useRouter();
+  const { user, login, isLoading: authLoading } = useUser();
 
   // Profile State
   const [name, setName] = useState(user?.name || "");
@@ -18,6 +20,13 @@ export default function SettingsPage() {
     text: string;
     type: "success" | "error";
   } | null>(null);
+
+  // Auth Redirect
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/login");
+    }
+  }, [user, authLoading, router]);
 
   // Sync user data
   useEffect(() => {
@@ -114,84 +123,6 @@ export default function SettingsPage() {
         </section>
 
         <hr className="border-border/50" />
-
-        {/* Change Password Section */}
-        <section className="space-y-4">
-          <h2 className="text-sm font-bold text-foreground-muted uppercase tracking-wider">
-            Şifre Değiştir
-          </h2>
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const currentPassword = (e.target as any).currentPassword.value;
-              const newPassword = (e.target as any).newPassword.value;
-
-              if (!currentPassword || !newPassword) return;
-
-              setIsLoading(true);
-              setMessage(null);
-
-              try {
-                const res = await fetch("/api/user/update", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    userId: user?.id,
-                    currentPassword,
-                    password: newPassword,
-                  }),
-                });
-
-                const data = await res.json();
-                if (!res.ok)
-                  throw new Error(data.error || "Şifre güncellenemedi.");
-
-                setMessage({
-                  text: "Şifre başarıyla güncellendi.",
-                  type: "success",
-                });
-                (e.target as any).reset();
-              } catch (err: any) {
-                setMessage({ text: err.message, type: "error" });
-              } finally {
-                setIsLoading(false);
-              }
-            }}
-            className="space-y-4"
-          >
-            <div className="space-y-1">
-              <label className="text-xs text-foreground-muted pl-1">
-                Mevcut Şifre
-              </label>
-              <input
-                name="currentPassword"
-                type="password"
-                required
-                className="w-full bg-surface border border-border rounded-xl p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                placeholder="••••••••"
-              />
-            </div>
-            <div className="space-y-1">
-              <label className="text-xs text-foreground-muted pl-1">
-                Yeni Şifre
-              </label>
-              <input
-                name="newPassword"
-                type="password"
-                required
-                className="w-full bg-surface border border-border rounded-xl p-3 text-white focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
-                placeholder="••••••••"
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-4 rounded-xl transition-all cursor-pointer font-display active:scale-95 disabled:opacity-50"
-            >
-              {isLoading ? "İşleniyor..." : "Şifreyi Güncelle"}
-            </button>
-          </form>
-        </section>
 
         <NotificationManager />
       </main>

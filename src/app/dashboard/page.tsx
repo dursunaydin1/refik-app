@@ -9,6 +9,7 @@ import ProgressChart from "@/components/ProgressChart";
 import GroupLeaderboard from "@/components/GroupLeaderboard";
 import ParticipantList from "@/components/ParticipantList";
 import MobileNav from "@/components/MobileNav";
+import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import {
   Flame,
@@ -21,13 +22,21 @@ import {
 } from "lucide-react";
 
 export default function DashboardPage() {
+  const router = useRouter();
   const { user, isLoading: authLoading } = useUser();
   const [stats, setStats] = useState<any>(null);
   const [detailedStats, setDetailedStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // If auth is done and no user, go to login
+    if (!authLoading && !user) {
+      router.push("/login");
+      return;
+    }
+
     if (user?.id) {
+      setIsLoading(true);
       const p1 = fetch(`/api/dashboard?userId=${user.id}`).then((res) =>
         res.json(),
       );
@@ -39,20 +48,24 @@ export default function DashboardPage() {
         .then(([dashboardData, statsData]) => {
           setStats(dashboardData);
           setDetailedStats(statsData);
-          setIsLoading(false);
         })
         .catch((err) => {
           console.error("Failed to fetch stats:", err);
+        })
+        .finally(() => {
           setIsLoading(false);
         });
     }
-  }, [user]);
+  }, [user, authLoading, router]);
 
-  if (authLoading || isLoading) {
+  if (authLoading || (isLoading && !stats)) {
     return (
       <div className="min-h-screen bg-background-dark flex items-center justify-center">
-        <div className="text-primary animate-pulse font-display font-bold">
-          Yükleniyor...
+        <div className="flex flex-col items-center gap-4">
+          <div className="size-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+          <div className="text-primary/60 font-display font-bold animate-pulse">
+            Veriler Hazırlanıyor...
+          </div>
         </div>
       </div>
     );

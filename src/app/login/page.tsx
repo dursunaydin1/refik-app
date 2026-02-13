@@ -56,6 +56,13 @@ export default function LoginPage() {
 
       const data = await res.json();
 
+      // Check if login was successful immediately (if no password required)
+      if (res.ok && data.success) {
+        login(data.user);
+        router.push("/dashboard");
+        return;
+      }
+
       if (res.status === 403) {
         // Gated: Not invited or Pending
         if (data.status === "PENDING") {
@@ -70,13 +77,15 @@ export default function LoginPage() {
         return;
       }
 
-      // If we reach here, it means the user is ACTIVE and needs a password
-      // or there was a server error
-      if (!res.ok && res.status !== 401) {
-        throw new Error(data.error || "Bir hata oluştu.");
+      // If we reach here and it's 401, it means a password is required
+      if (res.status === 401 && data.needsPassword) {
+        setStep(2);
+        return;
       }
 
-      setStep(2);
+      if (!res.ok) {
+        throw new Error(data.error || "Bir hata oluştu.");
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -175,7 +184,8 @@ export default function LoginPage() {
                       placeholder="05xx xxx xx xx"
                       required
                       autoFocus
-                      className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display placeholder:text-foreground-muted/50"
+                      disabled={isLoading}
+                      className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display placeholder:text-foreground-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -233,7 +243,8 @@ export default function LoginPage() {
                       placeholder="••••••••"
                       required
                       autoFocus
-                      className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display placeholder:text-foreground-muted/50"
+                      disabled={isLoading}
+                      className="w-full bg-background-dark/50 border border-border rounded-xl py-4 pl-12 pr-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display placeholder:text-foreground-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
@@ -260,16 +271,6 @@ export default function LoginPage() {
             "Sizin en hayırlınız, Kur'an'ı öğrenen ve öğretendir."
           </p>
         </motion.div>
-
-        {/* Admin Link at the bottom */}
-        <div className="text-center opacity-50 hover:opacity-100 transition-opacity">
-          <button
-            onClick={() => router.push("/admin/login")}
-            className="text-xs text-foreground-muted hover:text-primary transition-colors font-display uppercase tracking-widest border-b border-white/5 pb-1 cursor-pointer"
-          >
-            Yönetici Girişi
-          </button>
-        </div>
       </div>
 
       {/* Footer Branding */}

@@ -25,28 +25,14 @@ export async function GET(request: Request) {
       );
     }
 
-    // Get User and their Group
+    // 1. Get User
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      include: {
-        group: {
-          include: {
-            members: {
-              include: {
-                progress: {
-                  where: {
-                    updatedAt: { gte: RAMADAN_START, lte: RAMADAN_END },
-                  },
-                },
-              },
-            },
-          },
-        },
-        progress: {
-          where: {
-            updatedAt: { gte: RAMADAN_START, lte: RAMADAN_END },
-          },
-        },
+      select: {
+        id: true,
+        name: true,
+        groupId: true,
+        role: true,
       },
     });
 
@@ -57,23 +43,61 @@ export async function GET(request: Request) {
       );
     }
 
-    // Only count progress within Ramadan dates
-    const userProgress = user.progress.length;
+    // 2. Get User Progress (Sequential)
+    const userProgressCount = await prisma.progress.count({
+      where: {
+        userId: user.id,
+        updatedAt: { gte: RAMADAN_START, lte: RAMADAN_END },
+      },
+    });
 
-    // Calculate Group Stats
-    const membersCount = user.group?.members.length || 0;
-    const groupProgress =
-      user.group?.members.reduce((acc, member) => {
-        const memberDays = member.progress.length;
-        return acc + (memberDays / 30) * 100;
-      }, 0) || 0;
+    // 3. Get Group Members and their progress counts
+    let members: any[] = [];
+    let groupProgressSum = 0;
+    let membersCount = 0;
+
+    if (user.groupId) {
+      const groupWithMembers = await prisma.group.findUnique({
+        where: { id: user.groupId },
+        include: {
+          members: {
+            select: {
+              id: true,
+              name: true,
+              progress: {
+                where: {
+                  updatedAt: { gte: RAMADAN_START, lte: RAMADAN_END },
+                },
+                select: { id: true },
+              },
+            },
+          },
+        },
+      });
+
+      if (groupWithMembers) {
+        membersCount = groupWithMembers.members.length;
+        members = groupWithMembers.members.map((m) => {
+          const mProgressCount = m.progress.length;
+          groupProgressSum += (mProgressCount / 30) * 100;
+
+          return {
+            id: m.id,
+            name: m.name,
+            progress: Math.round((mProgressCount / 30) * 100),
+            status:
+              mProgressCount >= userProgressCount ? "completed" : "reading",
+          };
+        });
+      }
+    }
 
     const ramadanStatus = getRamadanStatus();
 
     const stats = {
-      userProgressPercentage: Math.round((userProgress / 30) * 100),
-      totalGroupProgress: Math.round(groupProgress / (membersCount || 1)),
-      dailyGoalProgress: userProgress,
+      userProgressPercentage: Math.round((userProgressCount / 30) * 100),
+      totalGroupProgress: Math.round(groupProgressSum / (membersCount || 1)),
+      dailyGoalProgress: userProgressCount,
       remainingPages: 20,
       currentJuz:
         ramadanStatus === "before"
@@ -82,13 +106,7 @@ export async function GET(request: Request) {
             ? 30
             : getRamadanDay(),
       ramadanStatus,
-      members:
-        user.group?.members.map((m) => ({
-          id: m.id,
-          name: m.name,
-          progress: Math.round((m.progress.length / 30) * 100),
-          status: m.progress.length >= userProgress ? "completed" : "reading",
-        })) || [],
+      members,
     };
 
     return NextResponse.json(stats);
