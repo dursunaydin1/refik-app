@@ -48,6 +48,12 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
     }
   };
 
+  const handleCopy = () => {
+    navigator.clipboard.writeText(inviteLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   const resetForm = () => {
     setName("");
     setPhoneNumber("");
@@ -127,7 +133,12 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
                     type="tel"
                     required
                     value={phoneNumber}
-                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/\D/g, "");
+                      if (val.length <= 11) {
+                        setPhoneNumber(val);
+                      }
+                    }}
                     placeholder="05xx xxx xx xx"
                     className="w-full bg-background-dark/50 border border-border rounded-xl py-4 px-4 text-white focus:outline-none focus:border-primary/50 transition-all font-display"
                   />

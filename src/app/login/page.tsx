@@ -180,7 +180,12 @@ export default function LoginPage() {
                     <input
                       type="tel"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, ""); // Only numbers
+                        if (val.length <= 11) {
+                          setPhone(val);
+                        }
+                      }}
                       placeholder="05xx xxx xx xx"
                       required
                       autoFocus
