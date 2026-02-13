@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import confetti from "canvas-confetti";
 import Link from "next/link";
 import { useUser } from "@/context/UserContext";
+import { Medal, Quote, Home } from "lucide-react";
 
 export default function CompletionPage() {
   const { user } = useUser();
@@ -46,9 +47,7 @@ export default function CompletionPage() {
 
       <div className="relative z-10 space-y-8 max-w-lg animate-in fade-in zoom-in duration-1000">
         <div className="size-24 bg-primary/20 rounded-full flex items-center justify-center mx-auto border-4 border-primary/30 shadow-[0_0_30px_rgba(19,236,200,0.4)]">
-          <span className="material-symbols-outlined text-primary text-5xl">
-            military_tech
-          </span>
+          <Medal className="w-12 h-12 text-primary" />
         </div>
 
         <div className="space-y-2">
@@ -61,9 +60,7 @@ export default function CompletionPage() {
         </div>
 
         <div className="bg-surface border border-border p-6 rounded-2xl relative">
-          <span className="material-symbols-outlined text-4xl text-foreground-muted/20 absolute -top-4 -left-2">
-            format_quote
-          </span>
+          <Quote className="w-10 h-10 text-foreground-muted/10 absolute -top-4 -left-2" />
           <p className="text-lg italic text-foreground-muted font-display leading-relaxed">
             "Allah kabul etsin. Okuduğun her harf şefaatçin, her ayet yoluna
             ışık olsun. Nice Ramazanlara, nice hatimlere..."
@@ -75,7 +72,7 @@ export default function CompletionPage() {
             href="/dashboard"
             className="inline-flex items-center gap-2 bg-white text-background-dark px-8 py-4 rounded-full font-bold text-lg hover:scale-105 transition-transform shadow-xl"
           >
-            <span className="material-symbols-outlined">home</span>
+            <Home className="w-5 h-5" />
             Ana Sayfaya Dön
           </Link>
         </div>

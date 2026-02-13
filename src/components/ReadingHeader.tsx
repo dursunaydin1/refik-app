@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
+import { ArrowLeft, Settings, Share2 } from "lucide-react";
 
 interface ReadingHeaderProps {
   juz: number;
@@ -20,11 +20,9 @@ export default function ReadingHeader({
         <div className="flex items-center gap-3">
           <Link
             href="/dashboard"
-            className="p-2 hover:bg-white/5 rounded-lg transition-colors flex items-center justify-center"
+            className="p-2 hover:bg-white/5 rounded-lg transition-colors flex items-center justify-center p-2 rounded-lg"
           >
-            <span className="material-symbols-outlined text-primary">
-              arrow_back
-            </span>
+            <ArrowLeft className="w-5 h-5 text-primary" />
           </Link>
           <div className="flex flex-col">
             <h2 className="text-sm font-bold text-white font-display">
@@ -38,14 +36,10 @@ export default function ReadingHeader({
 
         <div className="flex items-center gap-2">
           <button className="p-2 hover:bg-white/5 rounded-lg transition-colors cursor-pointer hover:text-white group">
-            <span className="material-symbols-outlined text-xl text-foreground-muted group-hover:text-white transition-colors">
-              settings
-            </span>
+            <Settings className="w-5 h-5 text-foreground-muted group-hover:text-white transition-colors" />
           </button>
           <button className="p-2 hover:bg-white/5 rounded-lg transition-colors cursor-pointer hover:text-white group">
-            <span className="material-symbols-outlined text-xl text-foreground-muted group-hover:text-white transition-colors">
-              ios_share
-            </span>
+            <Share2 className="w-5 h-5 text-foreground-muted group-hover:text-white transition-colors" />
           </button>
         </div>
       </div>

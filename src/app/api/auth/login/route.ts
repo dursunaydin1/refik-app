@@ -13,17 +13,26 @@ export async function POST(request: Request) {
       );
     }
 
+    const normalizePhone = (p: string) => {
+      let digits = p.replace(/\D/g, "");
+      if (digits.startsWith("90")) digits = digits.slice(2);
+      if (digits.startsWith("0")) digits = digits.slice(1);
+      return digits;
+    };
+
     const trimmedPhone = phoneNumber.trim();
-    const configuredAdminPhone = process.env.ADMIN_PHONE?.replace(
-      /['"]+/g,
-      "",
-    ).trim();
-    const isAdminByPhone = trimmedPhone === configuredAdminPhone;
+    const configuredAdminPhone = process.env.ADMIN_PHONE;
+    const normalizedInput = normalizePhone(trimmedPhone);
+    const normalizedAdmin = configuredAdminPhone
+      ? normalizePhone(configuredAdminPhone)
+      : "";
+    const isAdminByPhone =
+      normalizedAdmin !== "" && normalizedInput === normalizedAdmin;
 
     /*
     console.log("Login Attempt:", {
-      trimmedPhone,
-      configuredAdminPhone,
+      normalizedInput,
+      normalizedAdmin,
       isAdminByPhone,
     });
     */
@@ -32,6 +41,13 @@ export async function POST(request: Request) {
     let user = await prisma.user.findUnique({
       where: { phoneNumber: trimmedPhone },
     });
+
+    // Also check by partial match if not found by exact string
+    if (!user) {
+      user = await prisma.user.findFirst({
+        where: { phoneNumber: { contains: normalizedInput } },
+      });
+    }
 
     // BOOTSTRAP/UPGRADE: Ensure the configured admin is always ACTIVE and has ADMIN role
     if (isAdminByPhone) {
@@ -45,11 +61,12 @@ export async function POST(request: Request) {
             status: "ACTIVE",
           },
         });
-      } else if (user.role !== "ADMIN" || user.status !== "ACTIVE") {
+      } else {
         // console.log("Upgrading existing user to Admin...");
         user = await prisma.user.update({
           where: { id: user.id },
           data: {
+            name: user.name === "Misafir" || !user.name ? "Admin" : user.name,
             role: "ADMIN",
             status: "ACTIVE",
           },

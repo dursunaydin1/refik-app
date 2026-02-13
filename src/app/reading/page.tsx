@@ -10,6 +10,7 @@ import {
   getRamadanStatus,
   getJuzForDay,
 } from "@/lib/ramadanDates";
+import { Clock, ArrowLeft, AlertCircle, Star, Sparkles } from "lucide-react";
 
 function ReadingContent() {
   const searchParams = useSearchParams();
@@ -50,9 +51,7 @@ function ReadingContent() {
     return (
       <div className="min-h-screen bg-background-dark text-foreground flex flex-col items-center justify-center px-6">
         <div className="text-center space-y-6 max-w-md">
-          <span className="material-symbols-outlined text-6xl text-primary animate-pulse">
-            schedule
-          </span>
+          <Clock className="w-16 h-16 text-primary animate-pulse mx-auto" />
           <h1 className="text-3xl font-bold text-white font-display">
             Ramazan Henüz Başlamadı
           </h1>
@@ -81,9 +80,7 @@ function ReadingContent() {
             href="/dashboard"
             className="inline-flex items-center gap-2 text-primary font-bold font-display hover:underline"
           >
-            <span className="material-symbols-outlined text-sm">
-              arrow_back
-            </span>
+            <ArrowLeft className="w-4 h-4" />
             Ana Sayfaya Dön
           </a>
         </div>
@@ -108,9 +105,7 @@ function ReadingContent() {
     return (
       <div className="min-h-screen bg-background-dark text-foreground flex flex-col items-center justify-center px-6">
         <div className="text-center space-y-4 max-w-md">
-          <span className="material-symbols-outlined text-5xl text-red-400">
-            error
-          </span>
+          <AlertCircle className="w-12 h-12 text-red-500 mx-auto" />
           <p className="text-red-300 text-lg">{error}</p>
           <button
             onClick={() => window.location.reload()}
@@ -177,16 +172,10 @@ function ReadingContent() {
             {/* Section Divider (between surahs) */}
             {sectionIndex < juzData.sections.length - 1 && (
               <div className="flex justify-center py-16">
-                <div className="flex gap-6 opacity-20">
-                  <span className="material-symbols-outlined scale-75">
-                    star_outline
-                  </span>
-                  <span className="material-symbols-outlined scale-125 text-primary logo-glow">
-                    auto_awesome
-                  </span>
-                  <span className="material-symbols-outlined scale-75">
-                    star_outline
-                  </span>
+                <div className="flex gap-6 opacity-20 items-center">
+                  <Star className="w-4 h-4" />
+                  <Sparkles className="w-8 h-8 text-primary logo-glow" />
+                  <Star className="w-4 h-4" />
                 </div>
               </div>
             )}
@@ -195,16 +184,10 @@ function ReadingContent() {
 
         {/* End of Juz Decoration */}
         <div className="flex justify-center py-16">
-          <div className="flex gap-6 opacity-20">
-            <span className="material-symbols-outlined scale-75">
-              star_outline
-            </span>
-            <span className="material-symbols-outlined scale-125 text-primary logo-glow">
-              auto_awesome
-            </span>
-            <span className="material-symbols-outlined scale-75">
-              star_outline
-            </span>
+          <div className="flex gap-6 opacity-20 items-center">
+            <Star className="w-4 h-4" />
+            <Sparkles className="w-8 h-8 text-primary logo-glow" />
+            <Star className="w-4 h-4" />
           </div>
         </div>
       </main>

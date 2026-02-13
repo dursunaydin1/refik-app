@@ -20,11 +20,18 @@ import {
  */
 export default function AdminLoginPage() {
   const router = useRouter();
-  const { login } = useUser();
+  const { login, user: currentUser } = useUser();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // If already logged in, skip login page
+  React.useEffect(() => {
+    if (currentUser) {
+      router.push("/dashboard");
+    }
+  }, [currentUser, router]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

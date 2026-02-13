@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/UserContext";
+import { Bell, BellRing, BellOff } from "lucide-react";
 
 const PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 
@@ -98,7 +99,7 @@ export default function NotificationManager() {
     <div className="p-4 bg-surface border border-border rounded-xl">
       <div className="flex items-center gap-3 mb-3">
         <div className="p-2 bg-primary/10 rounded-lg text-primary">
-          <span className="material-symbols-outlined">notifications</span>
+          <Bell className="w-5 h-5" />
         </div>
         <div>
           <h3 className="font-bold text-white font-display">Bildirimler</h3>
@@ -118,9 +119,7 @@ export default function NotificationManager() {
       ) : (
         <div className="flex gap-2">
           <div className="grow bg-primary/10 border border-primary/20 text-primary font-bold py-3 px-4 rounded-xl font-display flex items-center justify-center gap-2">
-            <span className="material-symbols-outlined icon-fill">
-              notifications_active
-            </span>
+            <BellRing className="w-5 h-5" />
             <span>Açık</span>
           </div>
           <button
@@ -136,7 +135,7 @@ export default function NotificationManager() {
             className="bg-surface-lighter hover:bg-red-500/10 hover:text-red-400 hover:border-red-500/20 border border-border text-foreground-muted py-3 px-4 rounded-xl transition-all cursor-pointer font-display flex items-center justify-center active:scale-95"
             title="Bildirimleri Kapat"
           >
-            <span className="material-symbols-outlined">notifications_off</span>
+            <BellOff className="w-5 h-5" />
           </button>
         </div>
       )}

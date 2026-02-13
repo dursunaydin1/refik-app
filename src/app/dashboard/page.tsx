@@ -4,12 +4,21 @@ import React, { useEffect, useState } from "react";
 import Sidebar from "@/components/Sidebar";
 import Header from "@/components/Header";
 import ProgressCard from "@/components/ProgressCard";
+import StatsCard from "@/components/StatsCard";
+import ProgressChart from "@/components/ProgressChart";
+import GroupLeaderboard from "@/components/GroupLeaderboard";
 import ParticipantList from "@/components/ParticipantList";
 import MobileNav from "@/components/MobileNav";
 import { useUser } from "@/context/UserContext";
-import ProgressChart from "@/components/ProgressChart";
-import StatsCard from "@/components/StatsCard";
-import GroupLeaderboard from "@/components/GroupLeaderboard";
+import {
+  Flame,
+  BookOpen,
+  TrendingUp,
+  Calendar,
+  Trophy,
+  Lightbulb,
+  Send,
+} from "lucide-react";
 
 export default function DashboardPage() {
   const { user, isLoading: authLoading } = useUser();
@@ -82,36 +91,32 @@ export default function DashboardPage() {
                 <StatsCard
                   title="Zincir"
                   value={`${detailedStats?.stats?.streak || 0} Gün`}
-                  icon="local_fire_department"
+                  icon={<Flame className="w-5 h-5" />}
                   trend="İstikrarlı"
                   trendUp={true}
                 />
                 <StatsCard
                   title="Toplam"
                   value={detailedStats?.stats?.totalRead || 0}
-                  icon="auto_stories"
+                  icon={<BookOpen className="w-5 h-5" />}
                 />
-                <div className="p-4 rounded-2xl bg-surface border border-border flex flex-col justify-between">
+                <div className="p-4 rounded-2xl bg-surface border border-border flex flex-col justify-between relative overflow-hidden group">
                   <span className="text-foreground-muted text-xs font-medium">
                     Grup
                   </span>
                   <div className="text-primary font-bold text-lg font-display">
                     %{stats?.totalGroupProgress || 0}
                   </div>
-                  <span className="material-symbols-outlined text-primary/20 text-4xl absolute bottom-2 right-2">
-                    trending_up
-                  </span>
+                  <TrendingUp className="text-primary/10 text-4xl absolute bottom-2 right-2 w-10 h-10 -rotate-12 group-hover:scale-110 transition-transform" />
                 </div>
-                <div className="p-4 rounded-2xl bg-surface border border-border flex flex-col justify-between">
+                <div className="p-4 rounded-2xl bg-surface border border-border flex flex-col justify-between relative overflow-hidden group">
                   <span className="text-foreground-muted text-xs font-medium">
                     Kalan
                   </span>
                   <div className="text-white font-bold text-lg font-display">
                     {30 - (stats?.dailyGoalProgress || 0)} Gün
                   </div>
-                  <span className="material-symbols-outlined text-white/10 text-4xl absolute bottom-2 right-2">
-                    event
-                  </span>
+                  <Calendar className="text-white/10 text-4xl absolute bottom-2 right-2 w-10 h-10 group-hover:scale-110 transition-transform" />
                 </div>
               </div>
 
@@ -135,9 +140,7 @@ export default function DashboardPage() {
                   <h3 className="font-bold text-white font-display">
                     Liderlik Tablosu
                   </h3>
-                  <span className="material-symbols-outlined text-yellow-400">
-                    emoji_events
-                  </span>
+                  <Trophy className="w-5 h-5 text-yellow-400" />
                 </div>
                 {detailedStats?.leaderboard && (
                   <GroupLeaderboard users={detailedStats.leaderboard} />
@@ -148,9 +151,7 @@ export default function DashboardPage() {
 
               <div className="p-6 rounded-2xl bg-accent/10 border border-accent/20 space-y-3">
                 <div className="flex items-center gap-2 text-accent">
-                  <span className="material-symbols-outlined text-sm font-variation-icon">
-                    lightbulb
-                  </span>
+                  <Lightbulb className="w-4 h-4" />
                   <p className="text-xs font-bold uppercase tracking-widest text-[10px]">
                     Günün Hatırlatıcısı
                   </p>
@@ -183,7 +184,7 @@ export default function DashboardPage() {
                     }}
                     className="w-full bg-surface-lighter hover:bg-surface-hover border border-border text-white font-bold py-3 px-4 rounded-xl transition-all cursor-pointer font-display flex items-center justify-center gap-2 active:scale-95 text-sm"
                   >
-                    <span className="material-symbols-outlined">send</span>
+                    <Send className="w-4 h-4" />
                     Hatırlatma Gönder
                   </button>
                 </div>

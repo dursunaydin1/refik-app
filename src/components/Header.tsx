@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useUser } from "@/context/UserContext";
+import { Search, Bell } from "lucide-react";
 
 export default function Header() {
   const { user } = useUser();
@@ -18,9 +19,7 @@ export default function Header() {
     <header className="flex items-center justify-between p-6 lg:px-8 border-b border-border bg-background-dark/80 backdrop-blur-md sticky top-0 z-30">
       <div className="grow max-w-xl">
         <div className="relative group">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors">
-            search
-          </span>
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-foreground-muted group-focus-within:text-primary transition-colors w-4 h-4" />
           <input
             type="text"
             placeholder="Sure veya ayet ara..."
@@ -31,7 +30,7 @@ export default function Header() {
 
       <div className="flex items-center gap-4 ml-6">
         <button className="size-10 rounded-xl bg-surface border border-border flex items-center justify-center text-foreground-muted hover:text-primary transition-colors relative">
-          <span className="material-symbols-outlined">notifications</span>
+          <Bell className="w-5 h-5" />
           <span className="absolute top-2.5 right-2.5 size-2 bg-primary rounded-full border-2 border-surface"></span>
         </button>
 

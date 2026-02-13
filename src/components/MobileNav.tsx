@@ -1,9 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import InviteModal from "./InviteModal";
+import {
+  LayoutDashboard,
+  BookOpen,
+  Users,
+  Settings,
+  Share2,
+} from "lucide-react";
 
 export default function MobileNav() {
   const router = useRouter();
@@ -12,11 +19,28 @@ export default function MobileNav() {
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   const navItems = [
-    { icon: "dashboard", label: "Panel", path: "/dashboard" },
-    { icon: "menu_book", label: "Okuma", path: "/reading" },
-    { icon: "group", label: "Grup", path: "/group" },
-    { icon: "settings", label: "Ayarlar", path: "/settings" },
-    { icon: "share", label: "Davet", action: "invite", adminOnly: true },
+    {
+      icon: <LayoutDashboard className="w-6 h-6" />,
+      label: "Panel",
+      path: "/dashboard",
+    },
+    {
+      icon: <BookOpen className="w-6 h-6" />,
+      label: "Okuma",
+      path: "/reading",
+    },
+    { icon: <Users className="w-6 h-6" />, label: "Grup", path: "/group" },
+    {
+      icon: <Settings className="w-6 h-6" />,
+      label: "Ayarlar",
+      path: "/settings",
+    },
+    {
+      icon: <Share2 className="w-6 h-6" />,
+      label: "Davet",
+      action: "invite",
+      adminOnly: true,
+    },
   ];
 
   const handleOpenInvite = () => {
@@ -48,11 +72,7 @@ export default function MobileNav() {
                       : "text-foreground-muted hover:text-white"
                 }`}
               >
-                <span
-                  className={`material-symbols-outlined text-2xl ${isActive ? "font-variation-icon-fill" : ""}`}
-                >
-                  {item.icon}
-                </span>
+                {item.icon}
                 <span className="text-[10px] font-bold uppercase tracking-widest">
                   {item.label}
                 </span>

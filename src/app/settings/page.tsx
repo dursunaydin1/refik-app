@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import NotificationManager from "@/components/NotificationManager";
 import Link from "next/link";
 import { useUser } from "@/context/UserContext";
+import { ArrowLeft } from "lucide-react";
 
 export default function SettingsPage() {
   const { user, login } = useUser();
@@ -70,9 +71,7 @@ export default function SettingsPage() {
             href="/dashboard"
             className="p-2 hover:bg-white/5 rounded-lg transition-colors cursor-pointer mr-2"
           >
-            <span className="material-symbols-outlined text-foreground-muted">
-              arrow_back
-            </span>
+            <ArrowLeft className="w-5 h-5 text-foreground-muted" />
           </Link>
           <h1 className="text-xl font-bold text-white font-display">Ayarlar</h1>
         </div>

@@ -1,5 +1,7 @@
 "use client";
 
+import { Trophy } from "lucide-react";
+
 interface LeaderboardUser {
   id: string;
   name: string;
@@ -46,11 +48,7 @@ export default function GroupLeaderboard({
             </div>
           </div>
 
-          {index === 0 && (
-            <span className="material-symbols-outlined text-yellow-400 text-lg">
-              emoji_events
-            </span>
-          )}
+          {index === 0 && <Trophy className="w-5 h-5 text-yellow-400" />}
         </div>
       ))}
     </div>

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { UserPlus, X, Link, CheckCircle2, Copy, Check } from "lucide-react";
 
 interface InviteModalProps {
   isOpen: boolean;
@@ -74,17 +75,15 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
       >
         <button
           onClick={resetAndClose}
-          className="absolute top-4 right-4 text-foreground-muted hover:text-white hover:bg-white/10 rounded-full p-2 transition-all cursor-pointer"
+          className="absolute top-4 right-4 text-foreground-muted hover:text-white hover:bg-white/10 rounded-full p-2 transition-all cursor-pointer z-10"
         >
-          <span className="material-symbols-outlined">close</span>
+          <X className="w-5 h-5" />
         </button>
 
         <div className="space-y-6">
           <div className="flex flex-col items-center text-center space-y-4">
             <div className="size-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group">
-              <span className="material-symbols-outlined text-4xl group-hover:scale-110 transition-transform">
-                person_add
-              </span>
+              <UserPlus className="w-8 h-8 group-hover:scale-110 transition-transform" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-white font-display uppercase tracking-tight">
@@ -136,9 +135,7 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
 
                 {status === "error" && (
                   <div className="p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-xs rounded-xl flex items-center gap-2">
-                    <span className="material-symbols-outlined text-sm">
-                      error
-                    </span>
+                    <X className="w-4 h-4 text-red-500" />
                     {error}
                   </div>
                 )}
@@ -153,9 +150,7 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
                   ) : (
                     <>
                       <span>Davet Linki Oluştur</span>
-                      <span className="material-symbols-outlined text-sm">
-                        link
-                      </span>
+                      <Link className="w-4 h-4" />
                     </>
                   )}
                 </button>
@@ -169,9 +164,7 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
               >
                 <div className="bg-background-dark/50 border border-emerald-500/20 p-5 rounded-2xl space-y-3 relative overflow-hidden group">
                   <div className="absolute top-0 right-0 p-4 text-emerald-500/10 scale-150">
-                    <span className="material-symbols-outlined text-6xl">
-                      check_circle
-                    </span>
+                    <CheckCircle2 className="w-16 h-16" />
                   </div>
                   <div className="relative z-10">
                     <p className="text-[10px] text-emerald-500 uppercase tracking-widest font-bold">
@@ -187,9 +180,11 @@ export default function InviteModal({ isOpen, onClose }: InviteModalProps) {
                   onClick={handleCopy}
                   className="w-full h-14 bg-emerald-600 text-white rounded-xl font-bold hover:bg-emerald-700 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-lg shadow-emerald-900/20"
                 >
-                  <span className="material-symbols-outlined text-sm">
-                    {copied ? "done" : "content_copy"}
-                  </span>
+                  {copied ? (
+                    <Check className="w-4 h-4" />
+                  ) : (
+                    <Copy className="w-4 h-4" />
+                  )}
                   {copied ? "Linki Kopyalandı!" : "WhatsApp İçin Kopyala"}
                 </button>
 

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Link from "next/navigation";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import InviteModal from "@/components/InviteModal";
+import { ArrowLeft, Share2, Users, UserX, UserMinus } from "lucide-react";
 
 export default function GroupPage() {
   const router = useRouter();
@@ -77,9 +78,7 @@ export default function GroupPage() {
             onClick={() => router.push("/dashboard")}
             className="p-2 hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
           >
-            <span className="material-symbols-outlined text-foreground-muted">
-              arrow_back
-            </span>
+            <ArrowLeft className="w-6 h-6 text-foreground-muted" />
           </button>
           <h1 className="text-2xl font-bold text-white font-display">
             Grup Detayları
@@ -91,7 +90,7 @@ export default function GroupPage() {
             onClick={handleOpenInvite}
             className="bg-primary/10 text-primary border border-primary/20 px-4 py-2 rounded-xl text-sm font-bold hover:bg-primary/20 transition-all flex items-center gap-2 cursor-pointer"
           >
-            <span className="material-symbols-outlined text-sm">share</span>
+            <Share2 className="w-4 h-4" />
             Davet Et
           </button>
         )}
@@ -101,7 +100,7 @@ export default function GroupPage() {
         {/* Group Stats/Info would go here */}
         <section className="bg-surface border border-border rounded-3xl p-6 relative overflow-hidden">
           <div className="absolute top-0 right-0 p-8 opacity-5">
-            <span className="material-symbols-outlined text-8xl">group</span>
+            <Users className="w-24 h-24" />
           </div>
           <div className="relative z-10">
             <h2 className="text-xl font-bold text-white mb-1">Refik Grubu</h2>
@@ -156,18 +155,14 @@ export default function GroupPage() {
                       className="p-2 text-red-400 hover:bg-red-400/10 rounded-xl transition-all cursor-pointer"
                       title="Gruptan Çıkar"
                     >
-                      <span className="material-symbols-outlined text-[20px]">
-                        person_remove
-                      </span>
+                      <UserX className="w-5 h-5" />
                     </button>
                   )}
                 </div>
               ))
             ) : (
               <div className="text-center py-10 border-2 border-dashed border-border rounded-3xl">
-                <span className="material-symbols-outlined text-4xl text-foreground-muted mb-2 opacity-20">
-                  group_off
-                </span>
+                <Users className="w-12 h-12 text-foreground-muted mb-2 opacity-20 mx-auto" />
                 <p className="text-foreground-muted">Henüz kimse yok.</p>
               </div>
             )}

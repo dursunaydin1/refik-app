@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useUser } from "@/context/UserContext";
+import { CheckCircle2 } from "lucide-react";
 
 interface ReadingFooterProps {
   day: number;
@@ -70,7 +71,7 @@ export default function ReadingFooter({ day }: ReadingFooterProps) {
             <div className="size-6 border-2 border-background-dark/30 border-t-background-dark rounded-full animate-spin"></div>
           ) : (
             <>
-              <span className="material-symbols-outlined">task_alt</span>
+              <CheckCircle2 className="w-6 h-6" />
               {day}. Gün Tamamlandı
             </>
           )}
